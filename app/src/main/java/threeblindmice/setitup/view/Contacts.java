@@ -1,6 +1,7 @@
-package threeblindmice.setitup;
+package threeblindmice.setitup.view;
 
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.provider.ContactsContract;
@@ -15,8 +16,13 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.widget.Toast;
 
+import java.util.Observable;
+import java.util.Observer;
 
-public class Contacts extends AppCompatActivity {
+import threeblindmice.setitup.R;
+
+
+public class Contacts extends AppCompatActivity implements Observer {
 
     private SimpleCursorAdapter adapter;
     // Defines the id of the loader for later reference
@@ -99,6 +105,8 @@ public class Contacts extends AppCompatActivity {
                 }
             };
 
+    // TODO: Handle Api lvls < 23 with conditional execution
+    @TargetApi(23)
     // Called when the user is performing an action which requires the app to read the
     // user's contacts
     public void getPermissionToReadUserContacts() {
@@ -128,6 +136,8 @@ public class Contacts extends AppCompatActivity {
 
     // Callback with the request from calling requestPermissions(...)
     @Override
+    // TODO: Handle Api lvls < 23 with conditional execution
+    @TargetApi(23)
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String permissions[],
                                            @NonNull int[] grantResults) {
@@ -151,5 +161,8 @@ public class Contacts extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void update(Observable observable, Object o) {
 
+    }
 }

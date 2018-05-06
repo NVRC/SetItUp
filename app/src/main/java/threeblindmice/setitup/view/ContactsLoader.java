@@ -1,4 +1,4 @@
-package threeblindmice.setitup;
+package threeblindmice.setitup.view;
 
 import android.database.Cursor;
 import android.os.Bundle;
@@ -7,7 +7,8 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SimpleCursorAdapter;
-import android.widget.Adapter;
+
+import threeblindmice.setitup.view.Contacts;
 
 /**
  * Created by Slate on 2018-05-04.
