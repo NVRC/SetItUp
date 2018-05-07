@@ -5,6 +5,7 @@ package threeblindmice.setitup.model;
  */
 
 public class ContactsModel {
+  //test
 
     //sorted contact info
         //contact aggregation
