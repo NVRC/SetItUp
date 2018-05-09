@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="horizontal" >
-    <TextView
-        android:id="@+id/tvName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:text="3"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
-</LinearLayout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+    <data>
+        <variable
+            name="viewModel"
+            type="threeblindmice.setitup.viewmodel.ContactViewModel"/>
+    </data>
+    <Button
+        android:layout_height="50dp"
+        android:layout_width="match_parent"
+        android:text="@{viewModel.name}"
+        />
+
+</layout>

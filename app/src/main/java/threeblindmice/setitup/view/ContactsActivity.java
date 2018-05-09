@@ -1,38 +1,29 @@
-/*
-
 package threeblindmice.setitup.view;
 
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.provider.ContactsContract;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.Loader;
-import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.widget.ListView;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
 import android.widget.Toast;
-
-import java.util.Observable;
-import java.util.Observer;
 
 import threeblindmice.setitup.R;
 
 
-public class Contacts extends AppCompatActivity implements Observer {
+/**
+ * Created by Slate on 2018-05-08.
+ */
 
-    private SimpleCursorAdapter adapter;
+public class ContactsActivity extends AppCompatActivity {
     // Defines the id of the loader for later reference
     public static final int CONTACT_LOADER_ID = 78;
     // From docs: A unique identifier for this loader. Can be whatever you want.
 
     // Identifier for the permission request
     private static final int READ_CONTACTS_PERMISSIONS_REQUEST = 1;
+
 
 
     @Override
@@ -42,70 +33,24 @@ public class Contacts extends AppCompatActivity implements Observer {
 
         getPermissionToReadUserContacts();
 
-        setupCursorAdapter();
-        // Find list and bind to adapter
-        ListView lvContacts = (ListView) findViewById(R.id.fragment_container);
-        lvContacts.setAdapter(adapter);
+        // Check for compatible layout versions
+        if (findViewById(R.id.fragment_container) != null){
+            // If a previous state is being restored, return
+            if (savedInstanceState != null){
+                return;
+            }
 
-        // Initialize the loader with a special ID and the defined callbacks from above
-        getSupportLoaderManager().initLoader(CONTACT_LOADER_ID,
-                new Bundle(), contactsLoader);
+            ContactsFragment cf = new ContactsFragment();
+            // If an intent provides additional run-time params
+            //cf.setArguments(getIntent().getExtras());
 
+            getSupportFragmentManager().beginTransaction()
+                        .add(R.id.fragment_container, cf).commit();
+
+        }
 
 
     }
-
-    private void setupCursorAdapter(){
-        // Column data from cursor to bind views from
-        String[] uiBindFrom = { ContactsContract.Contacts.DISPLAY_NAME };
-        // View IDs which will have the respective column data inserted
-        int[] uiBindTo = { R.id.tvName };
-        // Create the simple cursor adapter to use for our list
-        // specifying the template to inflate (item_contact),
-        adapter = new SimpleCursorAdapter(
-                this, R.layout.item_contact,
-                null, uiBindFrom, uiBindTo,
-                0);
-    }
-
-    // Defines the asynchronous callback for the contacts data loader
-    private LoaderManager.LoaderCallbacks<Cursor> contactsLoader =
-            new LoaderManager.LoaderCallbacks<Cursor>() {
-                // Create and return the actual cursor loader for the contacts data
-                @Override
-                public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-                    // Define the columns to retrieve
-                    String[] projectionFields = new String[] { ContactsContract.Contacts._ID,
-                            ContactsContract.Contacts.DISPLAY_NAME};
-                    // Construct the loader
-                    CursorLoader cursorLoader = new CursorLoader(Contacts.this,
-                            ContactsContract.Contacts.CONTENT_URI, // URI
-                            projectionFields, // projection fields
-                            null, // the selection criteria
-                            null, // the selection args
-                            null // the sort order
-                    );
-                    // Return the loader for use
-                    return cursorLoader;
-                }
-
-                // When the system finishes retrieving the Cursor through the CursorLoader,
-                // a call to the onLoadFinished() method takes place.
-                @Override
-                public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-                    // The swapCursor() method assigns the new Cursor to the adapter
-                    adapter.swapCursor(cursor);
-                }
-
-                // This method is triggered when the loader is being reset
-                // and the loader data is no longer available. Called if the data
-                // in the provider changes and the Cursor becomes stale.
-                @Override
-                public void onLoaderReset(Loader<Cursor> loader) {
-                    // Clear the Cursor we were using with another call to the swapCursor()
-                    adapter.swapCursor(null);
-                }
-            };
 
     // TODO: Handle Api lvls < 23 with conditional execution
     @TargetApi(23)
@@ -163,9 +108,4 @@ public class Contacts extends AppCompatActivity implements Observer {
         }
     }
 
-    @Override
-    public void update(Observable observable, Object o) {
-
-    }
 }
-*/

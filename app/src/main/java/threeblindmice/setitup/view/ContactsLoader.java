@@ -1,3 +1,4 @@
+/*
 package threeblindmice.setitup.view;
 
 import android.database.Cursor;
@@ -9,10 +10,14 @@ import android.support.v4.content.Loader;
 import android.support.v4.widget.SimpleCursorAdapter;
 
 import threeblindmice.setitup.view.Contacts;
-
+*/
 /**
  * Created by Slate on 2018-05-04.
  */
+/*
+import android.database.Cursor;
+import android.os.Bundle;
+import android.provider.ContactsContract;
 
 public class ContactsLoader implements LoaderManager.LoaderCallbacks<Cursor> {
     private Contacts contacts;
@@ -57,3 +62,4 @@ public class ContactsLoader implements LoaderManager.LoaderCallbacks<Cursor> {
         sAdapter.swapCursor(null);
     }
 }
+*/
