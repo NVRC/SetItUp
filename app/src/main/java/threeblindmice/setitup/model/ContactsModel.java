@@ -20,9 +20,11 @@ public class ContactsModel {
     }
 
     private void testPopulate(){
-        contactList.add(new Contact("Frank"));
-        contactList.add(new Contact("Sam"));
-        contactList.add(new Contact("Joe"));
+        for(int i = 0; i<20;i++){
+            contactList.add(new Contact(Integer.toString(i)));
+        }
+
+
 
     }
 
