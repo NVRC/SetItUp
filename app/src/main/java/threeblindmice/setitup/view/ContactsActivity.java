@@ -46,10 +46,7 @@ public class ContactsActivity extends AppCompatActivity {
 
             getSupportFragmentManager().beginTransaction()
                         .add(R.id.fragment_container, cf).commit();
-
         }
-
-
     }
 
     // TODO: Handle Api lvls < 23 with conditional execution

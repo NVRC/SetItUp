@@ -61,8 +61,6 @@ public class ContactsFragment extends Fragment {
             mBinding.getViewModel().setContact(contact);
             mBinding.executePendingBindings();
         }
-
-
     }
 
     private class ContactAdapter extends RecyclerView.Adapter<ContactHolder>{
