@@ -2,22 +2,18 @@ package threeblindmice.setitup;
 
 import org.junit.Test;
 
-import java.util.HashSet;
-
 import threeblindmice.setitup.model.Contact;
 
 import static org.junit.Assert.assertTrue;
 
 
-public class ContactUnitTest {
+public class LocalContactThreadUnitTest {
 
     String testHash;
     String testName;
-    String testNo;
-    public ContactUnitTest(){
+    public LocalContactThreadUnitTest(){
         testHash = "test";
         testName = "Murphy";
-        testNo = "8005550100";
     }
 
     @Test
@@ -35,26 +31,5 @@ public class ContactUnitTest {
 
         Contact testContact = new Contact(testName);
         assertTrue(testContact.getName().equals(testName)); // Safe due to String equals override
-    }
-
-    @Test
-    public void testPhoneNumbersHashSetUniqueness(){
-        HashSet<String> testHashSet = new HashSet<String>();
-        Contact testContact = new Contact(testName);
-
-        // First #
-        testContact.addPhoneNumber(testNo);
-        testHashSet.add(testNo);
-
-        // Second #
-        String temp = testNo.replace("1","2");
-        testContact.addPhoneNumber(temp);
-        testHashSet.add(temp);
-
-        //
-        testContact.addPhoneNumber(testNo);
-        assertTrue(testContact.getNumbers().equals(testHashSet));
-
-
     }
 }

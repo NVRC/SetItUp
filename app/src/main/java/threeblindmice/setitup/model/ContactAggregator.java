@@ -1,6 +1,6 @@
 package threeblindmice.setitup.model;
 
-import java.util.concurrent.ConcurrentHashMap;
+import android.content.Context;
 
 /**
  * Created by Slate on 2018-05-06.
@@ -10,18 +10,23 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ContactAggregator {
 
-    private ConcurrentHashMap synchronizedContacts;
 
-    public ContactAggregator(){
-        synchronizedContacts = new ConcurrentHashMap<String,Contact>();
+    private Context mContext;
 
+    public ContactAggregator(Context context){
+        mContext = context;
+
+
+
+        LocalContactThread lct = new LocalContactThread(mContext);
+        lct.start();
     }
 
-    public void updateContact(Contact newContact){
-        // Key is a hashed digest of the contact to avoid collisions
-        synchronizedContacts.put(newContact.getHash(),newContact);
 
-    }
+
+
+
+
 
 
 }

@@ -9,11 +9,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.util.List;
 
 import threeblindmice.setitup.R;
 import threeblindmice.setitup.databinding.FragmentContactsBinding;
 import threeblindmice.setitup.databinding.ItemContactBinding;
+import threeblindmice.setitup.events.RefreshContactListEvent;
 import threeblindmice.setitup.model.Contact;
 import threeblindmice.setitup.model.ContactsModel;
 import threeblindmice.setitup.viewmodel.ContactViewModel;
@@ -24,7 +29,8 @@ import threeblindmice.setitup.viewmodel.ContactViewModel;
 
 public class ContactsFragment extends Fragment {
     private ContactsModel mContactsModel;
-
+    private ContactAdapter mContactAdapter;
+    private List<Contact> currData;
     public static ContactsFragment newInstance() {
         return new ContactsFragment();
     }
@@ -33,16 +39,32 @@ public class ContactsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        EventBus.getDefault().register(this);
         mContactsModel = new ContactsModel(getActivity());
-
+        currData = mContactsModel.getContacts();
+        mContactAdapter = new ContactAdapter(currData);
         FragmentContactsBinding binding = DataBindingUtil
                 .inflate(inflater, R.layout.fragment_contacts, container, false);
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        binding.recyclerView.setAdapter(new ContactAdapter(mContactsModel.getContacts()));
+        binding.recyclerView.setAdapter(mContactAdapter);
+
 
         return binding.getRoot();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onUpdate(RefreshContactListEvent event){
+
+        //  TODO: Handle old data and swapping
+        //  Verify event.getContacts against currData and update only those newly added
+        //      ^^ Refactor to process in separate thread
+
+        if (currData != null){
+            currData.clear();
+        }
+        currData.addAll(event.getContacts());
+        mContactAdapter.notifyDataSetChanged();
     }
 
     // Private classes within this scope to utilize getActivity()
@@ -54,7 +76,7 @@ public class ContactsFragment extends Fragment {
         private ContactHolder(ItemContactBinding binding){
             super(binding.getRoot());
             mBinding = binding;
-            mBinding.setViewModel(new ContactViewModel(mContactsModel));
+            mBinding.setViewModel(new ContactViewModel());
         }
 
         public void bind(Contact contact){
@@ -66,9 +88,13 @@ public class ContactsFragment extends Fragment {
     private class ContactAdapter extends RecyclerView.Adapter<ContactHolder>{
         private List<Contact> mContacts;
 
+
         public ContactAdapter(List<Contact> contacts){
             mContacts = contacts;
+
         }
+
+
         @Override
         public ContactHolder onCreateViewHolder(ViewGroup parent, int viewType){
             LayoutInflater inflater = LayoutInflater.from(getActivity());
@@ -84,6 +110,7 @@ public class ContactsFragment extends Fragment {
         }
 
         @Override public int getItemCount(){
+            if(mContacts == null){return 0;}
             return mContacts.size();
         }
     }
