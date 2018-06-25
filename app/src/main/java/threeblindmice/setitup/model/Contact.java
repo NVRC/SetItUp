@@ -9,6 +9,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 /**
  * Created by Nathaniel Charlebois on 2018-05-06.
@@ -59,6 +60,10 @@ public class Contact {
 
         // Update the Contacts Hash
         this.hash = generateHash(generateDigest());
+    }
+
+    public void addPhoneNumberSet(Set<String> numberSet){
+        numberHashSet.addAll(numberSet);
     }
 
     public String getHash(){

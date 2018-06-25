@@ -8,9 +8,13 @@ import android.provider.ContactsContract;
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import threeblindmice.setitup.events.AddContactEvent;
+import threeblindmice.setitup.events.RemoveContactEvent;
 
 public class LocalContactThread extends Thread {
 
@@ -23,6 +27,7 @@ public class LocalContactThread extends Thread {
 
     @Override
     public void run(){
+        Set<Contact> baseSet = new HashSet<Contact>(queryAllContacts());
         while(true) {
             //TODO
             // Periodically check local contacts for updates
@@ -34,8 +39,35 @@ public class LocalContactThread extends Thread {
                     System.out.println(item);
                 }
                 */
-                queryAllContacts();
+
+                //  Contacts added during the sleep period are handled
+
                 Thread.sleep(UPDATE_PERIOD);
+                Set<Contact> newSet = new HashSet<Contact>(queryAllContacts());
+                /*
+                Collection newContactsToAdd = CollectionUtils.disjunction(baseSet, newSet);
+                for (Iterator<Contact> itr = newContactsToAdd.iterator(); itr.hasNext();){
+                    Contact tempContact = itr.next();
+                    // TODO: Check if this just creates pointers to one contact
+                    EventBus.getDefault().post(new AddContactEvent(tempContact));
+                }
+                */
+                Set<Contact> tempBase = new HashSet<>(baseSet);
+                baseSet.removeAll(newSet);
+                Set<Contact> contactsToRemove = baseSet;
+                newSet.removeAll(tempBase);
+                Set<Contact> contactsToAdd = newSet;
+                for (Iterator<Contact> i = contactsToAdd.iterator(); i.hasNext(); ) {
+                    Contact item = i.next();
+                    EventBus.getDefault().post(new AddContactEvent(item));
+                }
+                for (Iterator<Contact> i = contactsToRemove.iterator(); i.hasNext(); ) {
+                    Contact item = i.next();
+                    EventBus.getDefault().post(new RemoveContactEvent(item));
+                }
+
+                //  Reset T1
+                baseSet = new HashSet<Contact>(queryAllContacts());
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 // Implement thread.interrupt() behavior here

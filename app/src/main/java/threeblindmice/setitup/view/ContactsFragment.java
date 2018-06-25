@@ -55,7 +55,6 @@ public class ContactsFragment extends Fragment {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onUpdate(RefreshContactListEvent event){
-
         //  TODO: Handle old data and swapping
         //  Verify event.getContacts against currData and update only those newly added
         //      ^^ Refactor to process in separate thread
@@ -66,6 +65,7 @@ public class ContactsFragment extends Fragment {
         currData.addAll(event.getContacts());
         mContactAdapter.notifyDataSetChanged();
     }
+
 
     // Private classes within this scope to utilize getActivity()
     // The data binding pattern, details in layout xmls, decouples design from development
@@ -91,9 +91,7 @@ public class ContactsFragment extends Fragment {
 
         public ContactAdapter(List<Contact> contacts){
             mContacts = contacts;
-
         }
-
 
         @Override
         public ContactHolder onCreateViewHolder(ViewGroup parent, int viewType){
