@@ -38,7 +38,6 @@ public class Contact {
     }
 
 
-
     private String generateDigest(){
         return name;
     }
@@ -55,7 +54,7 @@ public class Contact {
     public void addPhoneNumber(String newNo){
         //TODO:
         //  Validate # (Handled perhaps in PhoneNumber)
-        //  Check for # uniqueness (hashSet)
+        //  Check for # uniqueness (hashSet)                    DONE
         numberHashSet.add(newNo);
 
         // Update the Contacts Hash

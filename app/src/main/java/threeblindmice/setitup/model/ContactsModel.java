@@ -8,6 +8,7 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -31,8 +32,9 @@ public class ContactsModel {
 
         synchronizedContacts = new ConcurrentHashMap<String,Contact>();
         EventBus.getDefault().register(this);
-
-        LocalContactThread lct = new LocalContactThread(mContext);
+        //  Pass an empty list to disable testing
+        List<Contact> testLoad = Collections.emptyList();
+        LocalContactThread lct = new LocalContactThread(mContext, testLoad);
         lct.start();
     }
 
@@ -49,17 +51,17 @@ public class ContactsModel {
             synchronizedContacts.put(cHash,c);
         } else if (putResult == null){
             //  New Contact Added
-            publishContactsToView();
+            publishContactToView( c,true);
         }
 
     }
 
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    public void updateContact(RemoveContactEvent newEvent){
+    public void removeContact(RemoveContactEvent newEvent){
         Contact c = newEvent.getContact();
         String cHash = c.getHash();
         synchronizedContacts.remove(cHash);
-        publishContactsToView();
+        publishContactToView(c,false);
     }
 
     public List<Contact> getContacts(){
@@ -68,7 +70,7 @@ public class ContactsModel {
         return contactList;
     }
 
-    private void publishContactsToView(){
-        EventBus.getDefault().post(new RefreshContactListEvent(new ArrayList<>(this.getContacts())));
+    private void publishContactToView(Contact c, boolean addFlag){
+        EventBus.getDefault().post(new RefreshContactListEvent( c, addFlag));
     }
 }

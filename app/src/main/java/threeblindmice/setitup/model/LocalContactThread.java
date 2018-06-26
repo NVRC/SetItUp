@@ -20,25 +20,22 @@ public class LocalContactThread extends Thread {
 
     private static final int UPDATE_PERIOD = 10000; // milliseconds
     private Context mContext;
+    private List<Contact> mTestLoad;
+    private boolean testBool;
 
-    public LocalContactThread(Context context){
+    public LocalContactThread(Context context, List<Contact> testLoad){
         mContext = context;
+        mTestLoad = testLoad;
+        if (testLoad.isEmpty()){
+            testBool = true;
+        }
     }
 
     @Override
     public void run(){
         Set<Contact> baseSet = new HashSet<Contact>(queryAllContacts());
         while(true) {
-            //TODO
-            // Periodically check local contacts for updates
             try {
-                /*
-                List<Contact> contacts = queryAllContacts();
-                for (Iterator<Contact> i = contacts.iterator(); i.hasNext(); ) {
-                    Contact item = i.next();
-                    System.out.println(item);
-                }
-                */
 
                 //  Contacts added during the sleep period are handled
 
@@ -57,6 +54,10 @@ public class LocalContactThread extends Thread {
                 Set<Contact> contactsToRemove = baseSet;
                 newSet.removeAll(tempBase);
                 Set<Contact> contactsToAdd = newSet;
+
+                //  Only preforming operations on new or updating Contacts saves RecyclerView
+                //  transactions and supports add() and remove() animations
+
                 for (Iterator<Contact> i = contactsToAdd.iterator(); i.hasNext(); ) {
                     Contact item = i.next();
                     EventBus.getDefault().post(new AddContactEvent(item));
@@ -77,34 +78,38 @@ public class LocalContactThread extends Thread {
     }
 
     private List<Contact> queryAllContacts(){
-        List<Contact> contacts = new ArrayList<>();
-        ContentResolver cr = mContext.getContentResolver();
-        Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI,
-                null,
-                null,null, null,null);
-        if (cur.getCount() > 0) {
-            while (cur.moveToNext()) {
-                String id = cur.getString(cur.getColumnIndex(ContactsContract.Contacts._ID));
-                String name = cur.getString(cur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-                Contact tempContact = new Contact(name);
+        List<Contact> contacts = new ArrayList<>(mTestLoad);
+        if(!testBool) {
+            ContentResolver cr = mContext.getContentResolver();
+            Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI,
+                    null,
+                    null, null, null, null);
+            if (cur.getCount() > 0) {
+                while (cur.moveToNext()) {
+                    String id = cur.getString(cur.getColumnIndex(ContactsContract.Contacts._ID));
+                    String name = cur.getString(cur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+                    Contact tempContact = new Contact(name);
 
-                if (Integer.parseInt(cur.getString(
-                        cur.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {
-                    Cursor pCur = cr.query(
-                            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                            null,
-                            ContactsContract.CommonDataKinds.Phone.CONTACT_ID +" = ?",
-                            new String[]{id}, null);
-                    while (pCur.moveToNext()) {
-                        String phoneNo = pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                        tempContact.addPhoneNumber(phoneNo);
+                    if (Integer.parseInt(cur.getString(
+                            cur.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {
+                        Cursor pCur = cr.query(
+                                ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                                null,
+                                ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
+                                new String[]{id}, null);
+                        while (pCur.moveToNext()) {
+                            String phoneNo = pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                            tempContact.addPhoneNumber(phoneNo);
+                        }
+                        pCur.close();
                     }
-                    pCur.close();
+                    contacts.add(tempContact);
+                    // TODO: Check if this just creates pointers to one contact
+                    EventBus.getDefault().post(new AddContactEvent(tempContact));
                 }
-                contacts.add(tempContact);
-                // TODO: Check if this just creates pointers to one contact
-                EventBus.getDefault().post(new AddContactEvent(tempContact));
             }
+        } else{
+            //  TODO: Add query testing features
         }
 
         return contacts;

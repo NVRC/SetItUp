@@ -24,7 +24,7 @@ import threeblindmice.setitup.model.ContactsModel;
 import threeblindmice.setitup.viewmodel.ContactViewModel;
 
 /**
- * Created by Slate on 2018-05-08.
+ * Created by Nathaniel Charlebois on 2018-05-08.
  */
 
 public class ContactsFragment extends Fragment {
@@ -53,17 +53,28 @@ public class ContactsFragment extends Fragment {
         return binding.getRoot();
     }
 
+
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onUpdate(RefreshContactListEvent event){
-        //  TODO: Handle old data and swapping
-        //  Verify event.getContacts against currData and update only those newly added
-        //      ^^ Refactor to process in separate thread
+        Contact contact = event.getContact();
+        int pos;
+        if(event.getFlag()){
+            //  Add condition
+                currData.add(contact);
+                pos = currData.indexOf(contact);
+                mContactAdapter.notifyItemInserted(pos);
 
-        if (currData != null){
-            currData.clear();
+        } else {
+            // Remove condition
+            pos = currData.indexOf(contact);
+            if(pos >- 1){
+                currData.remove(pos);
+                mContactAdapter.notifyItemRemoved(pos);
+                mContactAdapter.notifyItemRangeChanged(pos, currData.size());
+            }
+
         }
-        currData.addAll(event.getContacts());
-        mContactAdapter.notifyDataSetChanged();
     }
 
 

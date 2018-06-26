@@ -1,19 +1,23 @@
 package threeblindmice.setitup.events;
 
-import java.util.List;
-
 import threeblindmice.setitup.model.Contact;
 
 public class RefreshContactListEvent {
-    private List<Contact> contacts;
+    private Contact contact;
+    private boolean addFlag;
 
-    public RefreshContactListEvent(List<Contact> obj){
-        if(obj instanceof List){
-            contacts = obj;
+    public RefreshContactListEvent(Contact obj, boolean flag){
+        if(obj instanceof Contact){
+            contact = obj;
+            addFlag = flag;
         }
     }
 
-    public List<Contact> getContacts(){
-        return contacts;
+    public Contact getContact(){
+        return contact;
+    }
+
+    public boolean getFlag(){
+        return this.addFlag;
     }
 }
