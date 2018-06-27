@@ -25,22 +25,26 @@ public class ContactsModel {
     private ConcurrentHashMap synchronizedContacts;
     private ArrayList<Contact> contactList;
     private Context mContext;
+    LocalContactThread lct;
 
 
     public ContactsModel(Context context){
-        mContext = context;
+        this.mContext = context;
 
         synchronizedContacts = new ConcurrentHashMap<String,Contact>();
         EventBus.getDefault().register(this);
         //  Pass an empty list to disable testing
         List<Contact> testLoad = Collections.emptyList();
-        LocalContactThread lct = new LocalContactThread(mContext, testLoad);
-        lct.start();
+        this.lct = new LocalContactThread(mContext);
+
+        this.lct.start();
+
     }
 
 
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void updateContact(AddContactEvent newEvent){
+
         Contact c = newEvent.getContact();
         String cHash = c.getHash();
         // Key is a hashed digest of the contact to avoid collisions
@@ -58,6 +62,7 @@ public class ContactsModel {
 
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void removeContact(RemoveContactEvent newEvent){
+
         Contact c = newEvent.getContact();
         String cHash = c.getHash();
         synchronizedContacts.remove(cHash);

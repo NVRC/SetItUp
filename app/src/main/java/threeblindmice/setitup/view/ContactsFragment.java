@@ -31,6 +31,9 @@ public class ContactsFragment extends Fragment {
     private ContactsModel mContactsModel;
     private ContactAdapter mContactAdapter;
     private List<Contact> currData;
+
+
+
     public static ContactsFragment newInstance() {
         return new ContactsFragment();
     }
@@ -57,9 +60,11 @@ public class ContactsFragment extends Fragment {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onUpdate(RefreshContactListEvent event){
+
         Contact contact = event.getContact();
         int pos;
         if(event.getFlag()){
+
             //  Add condition
                 currData.add(contact);
                 pos = currData.indexOf(contact);
@@ -67,6 +72,7 @@ public class ContactsFragment extends Fragment {
 
         } else {
             // Remove condition
+
             pos = currData.indexOf(contact);
             if(pos >- 1){
                 currData.remove(pos);

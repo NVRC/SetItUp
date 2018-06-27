@@ -25,7 +25,6 @@ public class ContactsActivity extends AppCompatActivity {
     private static final int READ_CONTACTS_PERMISSIONS_REQUEST = 1;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,6 +35,7 @@ public class ContactsActivity extends AppCompatActivity {
         // Check for compatible layout versions
         if (findViewById(R.id.fragment_container) != null){
             // If a previous state is being restored, return
+
             if (savedInstanceState != null){
                 return;
             }
@@ -46,8 +46,12 @@ public class ContactsActivity extends AppCompatActivity {
 
             getSupportFragmentManager().beginTransaction()
                         .add(R.id.fragment_container, cf).commit();
+
         }
+
     }
+
+
 
     // TODO: Handle Api lvls < 23 with conditional execution
     @TargetApi(23)

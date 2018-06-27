@@ -20,27 +20,28 @@ public class LocalContactThread extends Thread {
 
     private static final int UPDATE_PERIOD = 10000; // milliseconds
     private Context mContext;
-    private List<Contact> mTestLoad;
-    private boolean testBool;
 
-    public LocalContactThread(Context context, List<Contact> testLoad){
+
+    public LocalContactThread(Context context){
         mContext = context;
-        mTestLoad = testLoad;
-        if (testLoad.isEmpty()){
-            testBool = true;
-        }
+
+
+
     }
 
     @Override
     public void run(){
-        Set<Contact> baseSet = new HashSet<Contact>(queryAllContacts());
+
+        Set<Contact> baseSet = new HashSet<>(queryAllContacts());
+        System.out.print(baseSet.toString());
         while(true) {
             try {
 
                 //  Contacts added during the sleep period are handled
 
                 Thread.sleep(UPDATE_PERIOD);
-                Set<Contact> newSet = new HashSet<Contact>(queryAllContacts());
+                Set<Contact> newSet = new HashSet<>(queryAllContacts());
+                System.out.print(newSet.toString());
                 /*
                 Collection newContactsToAdd = CollectionUtils.disjunction(baseSet, newSet);
                 for (Iterator<Contact> itr = newContactsToAdd.iterator(); itr.hasNext();){
@@ -55,20 +56,22 @@ public class LocalContactThread extends Thread {
                 newSet.removeAll(tempBase);
                 Set<Contact> contactsToAdd = newSet;
 
-                //  Only preforming operations on new or updating Contacts saves RecyclerView
+                //  Only preforming operations on new or updating Contacts saves RecyclerViewkeytool -exportcert -alias androiddebugkey -keystore ~/.android/debug.keystore -list -v
                 //  transactions and supports add() and remove() animations
 
                 for (Iterator<Contact> i = contactsToAdd.iterator(); i.hasNext(); ) {
                     Contact item = i.next();
                     EventBus.getDefault().post(new AddContactEvent(item));
+
                 }
                 for (Iterator<Contact> i = contactsToRemove.iterator(); i.hasNext(); ) {
                     Contact item = i.next();
                     EventBus.getDefault().post(new RemoveContactEvent(item));
+
                 }
 
                 //  Reset T1
-                baseSet = new HashSet<Contact>(queryAllContacts());
+                baseSet = new HashSet<>(queryAllContacts());
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 // Implement thread.interrupt() behavior here
@@ -78,8 +81,8 @@ public class LocalContactThread extends Thread {
     }
 
     private List<Contact> queryAllContacts(){
-        List<Contact> contacts = new ArrayList<>(mTestLoad);
-        if(!testBool) {
+        List<Contact> contacts = new ArrayList<>();
+
             ContentResolver cr = mContext.getContentResolver();
             Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI,
                     null,
@@ -108,9 +111,6 @@ public class LocalContactThread extends Thread {
                     EventBus.getDefault().post(new AddContactEvent(tempContact));
                 }
             }
-        } else{
-            //  TODO: Add query testing features
-        }
 
         return contacts;
     }
