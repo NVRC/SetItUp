@@ -76,6 +76,7 @@ public class LocalContactThread extends Thread {
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 // Implement thread.interrupt() behavior here
+                return;
             }
         }
 

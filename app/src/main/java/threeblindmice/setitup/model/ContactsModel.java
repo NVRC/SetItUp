@@ -41,6 +41,10 @@ public class ContactsModel {
 
     }
 
+    public void teardown(){
+        lct.interrupt();
+    }
+
 
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void updateContact(AddContactEvent newEvent){

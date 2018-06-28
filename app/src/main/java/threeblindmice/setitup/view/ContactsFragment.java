@@ -57,6 +57,14 @@ public class ContactsFragment extends Fragment {
     }
 
 
+    //  Save states
+    @Override
+    public void onPause(){
+        super.onPause();
+        mContactsModel.teardown();
+    }
+
+
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onUpdate(RefreshContactListEvent event){
