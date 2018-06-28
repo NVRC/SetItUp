@@ -42,10 +42,6 @@ public class ContactsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EventBus.getDefault().register(this);
-        mContactsModel = new ContactsModel(getActivity());
-        currData = mContactsModel.getContacts();
-        mContactAdapter = new ContactAdapter(currData);
         FragmentContactsBinding binding = DataBindingUtil
                 .inflate(inflater, R.layout.fragment_contacts, container, false);
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -54,6 +50,15 @@ public class ContactsFragment extends Fragment {
 
 
         return binding.getRoot();
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState){
+        super.onCreate(savedInstanceState);
+        EventBus.getDefault().register(this);
+        mContactsModel = new ContactsModel(getActivity());
+        currData = mContactsModel.getContacts();
+        mContactAdapter = new ContactAdapter(currData);
     }
 
 

@@ -14,6 +14,8 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -59,25 +61,28 @@ public class ContactsActivity extends AppCompatActivity {
         //  INIT toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         //  INIT nav drawer
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_fragment_container);
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                return true;
+        if(drawerLayout != null){
+
+            NavigationView navigationView = (NavigationView) findViewById(R.id.nav_fragment_container);
+            navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+                @Override
+                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                    return true;
+                }
+            });
+
+            //  INIT menu icon
+            final ActionBar actionBar = getSupportActionBar();
+            if (actionBar != null) {
+                //  TODO: Update menu icon
+                actionBar.setHomeAsUpIndicator(R.drawable.menu_icon);
+                actionBar.setDisplayHomeAsUpEnabled(true);
             }
-        });
-
-        //  INIT menu icon
-        final ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            //  TODO: Update menu icon
-            actionBar.setHomeAsUpIndicator(R.drawable.menu_icon);
-            actionBar.setDisplayHomeAsUpEnabled(true);
         }
-
         getPermissionToReadUserContacts();
         FragmentManager fragmentManager = getSupportFragmentManager();
         // Check for compatible layout versions
@@ -116,6 +121,14 @@ public class ContactsActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.options_menu, menu);
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // The action bar home/up action should open or close the drawer.
         switch (item.getItemId()) {
@@ -129,7 +142,9 @@ public class ContactsActivity extends AppCompatActivity {
 
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onFragmentUpdate(UpdateFragmentEvent event){
-        drawerLayout.closeDrawers();
+        if(drawerLayout != null) {
+            drawerLayout.closeDrawers();
+        }
         String tag = event.getTag();
         FragmentManager fragmentManager = getSupportFragmentManager();
         if (tag.equals(TAG_CONTACTS_FRAGMENT)){

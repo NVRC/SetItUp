@@ -23,7 +23,6 @@ public class OptionClickListener implements View.OnClickListener {
 
     @Override
     public void onClick(View v){
-        System.out.println("\t\t onClick ID: "+id);
         callbacks.onOptionSelected(id);
     }
 
