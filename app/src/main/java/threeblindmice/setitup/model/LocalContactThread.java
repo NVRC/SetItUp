@@ -50,13 +50,14 @@ public class LocalContactThread extends Thread {
                     EventBus.getDefault().post(new AddContactEvent(tempContact));
                 }
                 */
+
                 Set<Contact> tempBase = new HashSet<>(baseSet);
                 baseSet.removeAll(newSet);
                 Set<Contact> contactsToRemove = baseSet;
                 newSet.removeAll(tempBase);
                 Set<Contact> contactsToAdd = newSet;
 
-                //  Only preforming operations on new or updating Contacts saves RecyclerViewkeytool -exportcert -alias androiddebugkey -keystore ~/.android/debug.keystore -list -v
+                //  Only preforming operations on new or updating Contacts saves RecyclerViewer
                 //  transactions and supports add() and remove() animations
 
                 for (Iterator<Contact> i = contactsToAdd.iterator(); i.hasNext(); ) {

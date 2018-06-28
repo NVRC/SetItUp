@@ -64,15 +64,13 @@ public class ContactsFragment extends Fragment {
         Contact contact = event.getContact();
         int pos;
         if(event.getFlag()){
-
             //  Add condition
                 currData.add(contact);
                 pos = currData.indexOf(contact);
                 mContactAdapter.notifyItemInserted(pos);
 
         } else {
-            // Remove condition
-
+            //  Remove condition
             pos = currData.indexOf(contact);
             if(pos >- 1){
                 currData.remove(pos);
