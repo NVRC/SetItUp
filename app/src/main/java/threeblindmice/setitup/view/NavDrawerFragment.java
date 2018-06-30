@@ -7,6 +7,7 @@ import android.accounts.AccountManagerFuture;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -14,6 +15,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -35,6 +37,7 @@ public class NavDrawerFragment extends Fragment implements NavInterface {
     //  Fragment IDs
     private static final String TAG_EMPTY_FRAGMENT = "TAG_EMPTY_FRAGMENT";
     private static final String TAG_CONTACT_FRAGMENT = "TAG_CONTACT_FRAGMENT";
+    private static final int CONST_OPTIONS_ELEMENT_OFFSET = 4;
 
     private static final int AUTH_REQUEST = 0;
 
@@ -46,10 +49,16 @@ public class NavDrawerFragment extends Fragment implements NavInterface {
     }
 
     @Override
+    public void onCreate(Bundle bundle){
+        super.onCreate(bundle);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                               Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_nav_drawer, container, false);
+
 
         return view;
     }
@@ -58,10 +67,31 @@ public class NavDrawerFragment extends Fragment implements NavInterface {
     public void onStart(){
         super.onStart();
 
+        //  Set nav drawer header height
+        final LinearLayout layout = getView().findViewById(R.id.nav_header_container);
+        ViewTreeObserver vto = layout.getViewTreeObserver();
+        vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
 
-        LinearLayout ll = (LinearLayout) getView().findViewById(R.id.option_container);
+                ViewGroup.LayoutParams params = layout.getLayoutParams();
+                //  Sets the height to be width*9/16 as recommended in Material specs
+                Double height = layout.getMeasuredWidth() * 0.5725;
+                params.height = height.intValue();
+                layout.setLayoutParams(params);
+
+                ViewTreeObserver obs = layout.getViewTreeObserver();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                    obs.removeOnGlobalLayoutListener(this);
+                }
+            }
+        });
+
+
 
         // Programmatically handles all options defined in XML
+        LinearLayout ll = (LinearLayout) getView().findViewById(R.id.option_container);
+
         for( int i = 0; i < ll.getChildCount(); i++ ){
             //  View instead of TextView to handle polymorphism
             //  TODO: Update XML dependant View calls

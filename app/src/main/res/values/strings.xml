@@ -3,4 +3,8 @@
 
     <string name="search_title">Search</string>
     <string name="sort_title">Sort</string>
+    <string name="empty">Empty</string>
+    <string name="contacts">Contacts</string>
+    <string name="name_email_com">name@email.com</string>
+    <string name="some_name">Some name</string>
 </resources>

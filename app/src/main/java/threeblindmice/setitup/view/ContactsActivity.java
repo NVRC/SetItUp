@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -87,7 +88,9 @@ public class ContactsActivity extends AppCompatActivity {
             }
         }
         getPermissionToReadUserContacts();
-        FragmentManager fragmentManager = getSupportFragmentManager();
+
+
+
         // Check for compatible layout versions
         if (findViewById(R.id.fragment_container) != null){
             // If a previous state is being restored, return
@@ -99,9 +102,11 @@ public class ContactsActivity extends AppCompatActivity {
             cf = new ContactsFragment();
             // If an intent provides additional run-time params
             //cf.setArguments(getIntent().getExtras());
+            FragmentTransaction trans = getSupportFragmentManager().beginTransaction();
+            trans.addToBackStack(TAG_CONTACTS_FRAGMENT);
+            trans.replace(R.id.fragment_container, cf, TAG_CONTACTS_FRAGMENT);
 
-            fragmentManager.beginTransaction()
-                        .add(R.id.fragment_container, cf, TAG_CONTACTS_FRAGMENT).commit();
+            trans.commit();
 
         }
         // Check for compatible layout versions
@@ -115,9 +120,9 @@ public class ContactsActivity extends AppCompatActivity {
             NavDrawerFragment ndf = new NavDrawerFragment();
             // If an intent provides additional run-time params
             //ndf.setArguments(getIntent().getExtras());
-
-            fragmentManager.beginTransaction()
-                    .add(R.id.nav_fragment_container, ndf, TAG_NAV_FRAGMENT).commit();
+            FragmentTransaction trans = getSupportFragmentManager().beginTransaction();
+            trans.replace(R.id.nav_fragment_container, ndf, TAG_NAV_FRAGMENT);
+            trans.commit();
 
         }
 
@@ -155,8 +160,10 @@ public class ContactsActivity extends AppCompatActivity {
 
             Fragment frag = fragmentManager.findFragmentByTag(TAG_EMPTY_FRAGMENT);
             if(frag != null && frag.isVisible()){
-                fragmentManager.beginTransaction().replace(R.id.fragment_container, cf)
-                        .commit();
+                FragmentTransaction trans = getSupportFragmentManager().beginTransaction();
+                trans.addToBackStack(TAG_CONTACTS_FRAGMENT);
+                trans.replace(R.id.fragment_container,cf,TAG_CONTACTS_FRAGMENT);
+                trans.commit();
             }
 
         } else if (tag.equals(TAG_EMPTY_FRAGMENT)){
@@ -164,8 +171,9 @@ public class ContactsActivity extends AppCompatActivity {
             // Insert the fragment by replacing any existing fragment
             Fragment frag = fragmentManager.findFragmentByTag(TAG_CONTACTS_FRAGMENT);
             if(frag != null && frag.isVisible()){
-                fragmentManager.beginTransaction().replace(R.id.fragment_container, new EmptyFragment())
-                        .commit();
+                FragmentTransaction trans = getSupportFragmentManager().beginTransaction();
+                trans.replace(R.id.fragment_container, new EmptyFragment(),TAG_EMPTY_FRAGMENT);
+                trans.commit();
             }
         }
     }
