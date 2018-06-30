@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <LinearLayout
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/drawer_header_height"
+        android:gravity="bottom"
+        android:background="@color/primary_dark"
+        android:orientation="vertical"
+        android:padding="@dimen/activity_horizontal_margin"
+        android:id="@+id/nav_header_container"
+        >
+
+        <ImageView
+            android:id="@+id/nav_header_img"
+            android:layout_width="@dimen/drawer_header_profile"
+            android:layout_height="@dimen/drawer_header_profile"
+            android:paddingBottom="@dimen/nav_img_padding_bottom"
+            android:paddingLeft="@dimen/nav_img_padding_left"
+            android:src="@drawable/account_icon"
+            />
+
+        <TextView
+            android:id="@+id/nav_header_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/some_name"
+            android:textSize="@dimen/nav_header_name"
+            android:gravity="bottom"
+            android:layout_margin="@dimen/standard_margin"
+            android:paddingBottom="@dimen/nav_name_padding"
+            android:paddingLeft="@dimen/nav_name_padding"
+            android:textColor="@color/primary_light"
+            android:textStyle="bold"
+            />
+
+        <TextView
+            android:id="@+id/nav_header_email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/name_email_com"
+            android:textSize="@dimen/nav_header_email"
+            android:gravity="bottom"
+            android:layout_margin="@dimen/standard_margin"
+            android:paddingBottom="@dimen/nav_email_padding"
+            android:paddingLeft="@dimen/nav_email_padding"
+            android:textColor="@color/primary_light"
+            style="@style/Widget.AppCompat.Spinner"
+            />
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingTop="@dimen/standard_margin"
+        android:id="@+id/option_container">
+        <TextView
+            android:id="@+id/nav_drawer_option_0"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/nav_option_padding"
+            android:layout_margin="@dimen/standard_margin"
+            android:text="@string/contacts" />
+
+        <TextView
+            android:id="@+id/nav_drawer_option_1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/nav_option_padding"
+            android:layout_margin="@dimen/standard_margin"
+            android:text="@string/empty" />
+    </LinearLayout>
+
+
+</LinearLayout>

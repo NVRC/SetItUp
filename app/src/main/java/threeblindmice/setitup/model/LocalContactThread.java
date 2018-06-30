@@ -33,15 +33,13 @@ public class LocalContactThread extends Thread {
     public void run(){
 
         Set<Contact> baseSet = new HashSet<>(queryAllContacts());
-        System.out.print(baseSet.toString());
-        while(true) {
+        while(!this.isInterrupted()) {
             try {
 
                 //  Contacts added during the sleep period are handled
 
                 Thread.sleep(UPDATE_PERIOD);
                 Set<Contact> newSet = new HashSet<>(queryAllContacts());
-                System.out.print(newSet.toString());
                 /*
                 Collection newContactsToAdd = CollectionUtils.disjunction(baseSet, newSet);
                 for (Iterator<Contact> itr = newContactsToAdd.iterator(); itr.hasNext();){
@@ -74,8 +72,8 @@ public class LocalContactThread extends Thread {
                 //  Reset T1
                 baseSet = new HashSet<>(queryAllContacts());
             } catch (InterruptedException e) {
-                e.printStackTrace();
                 // Implement thread.interrupt() behavior here
+                return;
             }
         }
 

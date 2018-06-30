@@ -15,7 +15,7 @@ import java.util.Set;
  * Created by Nathaniel Charlebois on 2018-05-06.
  */
 
-public class Contact {
+public class Contact  implements Comparable<String>{
 
     private String name;
     private String hash;
@@ -67,6 +67,11 @@ public class Contact {
 
     public String getHash(){
         return this.hash;
+    }
+
+    @Override
+    public int compareTo(String nameAlt){
+        return this.name.compareTo(nameAlt);
     }
 
     @TargetApi(26)

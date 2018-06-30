@@ -9,6 +9,7 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -20,8 +21,11 @@ import threeblindmice.setitup.events.RemoveContactEvent;
  * Created by Slate on 2018-05-06.
  */
 
-public class ContactsModel {
 
+
+public class ContactsModel {
+    //  Thinking about the trade off using a hashmap vs treeset
+    //  both concurrent of course
     private ConcurrentHashMap synchronizedContacts;
     private ArrayList<Contact> contactList;
     private Context mContext;
@@ -39,6 +43,23 @@ public class ContactsModel {
 
         this.lct.start();
 
+    }
+
+    public void teardown(){
+        lct.interrupt();
+    }
+
+
+    public List<Contact> getAlphaSortedList(){
+        List<Contact> temp = new ArrayList<Contact>(contactList);
+                Collections.sort(temp, new Comparator<Contact>() {
+            @Override
+            public int compare(Contact c1, Contact c2) {
+                return c1.compareTo(c2.getName());
+
+            }
+        });
+    return temp;
     }
 
 
