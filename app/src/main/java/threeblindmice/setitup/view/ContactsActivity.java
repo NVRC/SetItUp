@@ -1,7 +1,9 @@
 package threeblindmice.setitup.view;
 
 import android.Manifest;
+import android.accounts.AccountManager;
 import android.annotation.TargetApi;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -38,6 +40,7 @@ public class ContactsActivity extends AppCompatActivity {
     private static final String TAG_EMPTY_FRAGMENT = "Empty";
     private static final String TAG_CONTACTS_FRAGMENT = "Contacts";
     private static final String TAG_NAV_FRAGMENT = "Nav";
+    private static final int AUTH_REQUEST = 0;
 
 
     // Defines the id of the loader for later reference
@@ -167,6 +170,21 @@ public class ContactsActivity extends AppCompatActivity {
         }
     }
 
+
+
+
+    @Override
+    protected void onActivityResult(int requestCode,int resultCode, Intent intent){
+        if (requestCode == AUTH_REQUEST){
+            if (resultCode == RESULT_OK){
+                //  New Auth token
+                AccountManager am = AccountManager.get(this);
+                // am.getAuthToken();
+            }
+
+        }
+
+    }
 
 
 

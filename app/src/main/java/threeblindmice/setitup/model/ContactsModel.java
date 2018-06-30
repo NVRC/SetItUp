@@ -24,7 +24,8 @@ import threeblindmice.setitup.events.RemoveContactEvent;
 
 
 public class ContactsModel {
-
+    //  Thinking about the trade off using a hashmap vs treeset
+    //  both concurrent of course
     private ConcurrentHashMap synchronizedContacts;
     private ArrayList<Contact> contactList;
     private Context mContext;
