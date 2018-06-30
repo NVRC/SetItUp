@@ -11,6 +11,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,9 +20,14 @@ import android.view.ViewTreeObserver;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
+
 import org.greenrobot.eventbus.EventBus;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import threeblindmice.setitup.R;
 import threeblindmice.setitup.events.UpdateFragmentEvent;
@@ -37,6 +43,7 @@ public class NavDrawerFragment extends Fragment implements NavInterface {
     //  Fragment IDs
     private static final String TAG_EMPTY_FRAGMENT = "TAG_EMPTY_FRAGMENT";
     private static final String TAG_CONTACT_FRAGMENT = "TAG_CONTACT_FRAGMENT";
+    private static final String GOOGLE_ACC_TYPE = "com.google";
     private static final int CONST_OPTIONS_ELEMENT_OFFSET = 4;
 
     private static final int AUTH_REQUEST = 0;
@@ -88,6 +95,53 @@ public class NavDrawerFragment extends Fragment implements NavInterface {
         });
 
 
+        //  Starts the account selection process
+        //  Precursor to OAuth2
+        TextView email = (TextView) getView().findViewById(R.id.nav_header_email);
+        email.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AccountManager am = AccountManager.get(getActivity());
+                Account[] accounts = am.getAccountsByType(GOOGLE_ACC_TYPE);
+                List<String> accountNames = new ArrayList<>();
+                for (Account acc : accounts){
+                    accountNames.add(acc.name);
+                }
+                new MaterialDialog.Builder(getContext())
+                        .title(R.string.acc_dialog_title)
+                        .items(accountNames)
+                        .positiveText(R.string.add_acc)
+                        .negativeText(R.string.cancel)
+                        .itemsCallback(new MaterialDialog.ListCallback() {
+                            @Override
+                            public void onSelection (MaterialDialog dialog, View view, int which, CharSequence text){
+                                AccountManager am = AccountManager.get(getActivity());
+                                am.invalidateAuthToken(GOOGLE_ACC_TYPE,text.toString());
+                                startGoogleAuth(text);
+                                dialog.dismiss();
+                            }
+
+                        })
+                        .onNegative(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                dialog.dismiss();
+                            }
+                        })
+                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                //  Create an account in AccountManager
+                            }
+                        })
+
+                .show();
+            }
+        });
+
+
+
+
 
         // Programmatically handles all options defined in XML
         LinearLayout ll = (LinearLayout) getView().findViewById(R.id.option_container);
@@ -103,29 +157,33 @@ public class NavDrawerFragment extends Fragment implements NavInterface {
         }
     }
 
-    private void startGoogleAuth(){
+    private void startGoogleAuth(CharSequence targetName){
 
         AccountManager am = AccountManager.get(getActivity());
         Bundle options = new Bundle();
         //  Currently just selects the first account for testing
-        Account acc = am.getAccountsByType("com.google")[0];
-        //  TODO: Prompt user for account
+        Account[] accounts = am.getAccountsByType(GOOGLE_ACC_TYPE);
+        for (Account acc : accounts){
+            if(acc.name.equals(targetName)){
+                //  TODO: Implement error handling
+                am.getAuthToken(
+                        acc,                     // Account retrieved using getAccountsByType()
+                        "Schedule To Meet Up",            // Auth scope
+                        options,                        // Authenticator-specific options
+                        getActivity(),                           // Your activity
+                        new OnTokenAcquired(),          // Callback called when a token is successfully acquired
+                        new Handler(new onError()));    // Callback called if an error occurs
+            }
+        }
 
 
-        //  TODO: Implement error handling
-        am.getAuthToken(
-                acc,                     // Account retrieved using getAccountsByType()
-                "Schedule To Meet Up",            // Auth scope
-                options,                        // Authenticator-specific options
-                getActivity(),                           // Your activity
-                new OnTokenAcquired(),          // Callback called when a token is successfully acquired
-                new Handler(new onError()));    // Callback called if an error occurs
+
+
 
 
     }
 
-    //  TODO: Manage fragment transactions with IDs
-    //      -- Doable when UI/UX is decided
+    //  Manage fragment transactions with IDs
     @Override
     public void onOptionSelected(String id){
         EventBus.getDefault().post(new UpdateFragmentEvent(id));
@@ -136,7 +194,7 @@ public class NavDrawerFragment extends Fragment implements NavInterface {
     private class onError implements Handler.Callback {
         @Override
         public boolean handleMessage(Message message){
-
+            System.out.println(Message.obtain());
             return true;
         }
     }

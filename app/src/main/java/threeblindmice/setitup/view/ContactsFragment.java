@@ -68,6 +68,12 @@ public class ContactsFragment extends Fragment {
         super.onPause();
         mContactsModel.teardown();
     }
+    @Override
+    public void onDestroy() {
+
+
+        super.onDestroy();
+    }
 
 
 
