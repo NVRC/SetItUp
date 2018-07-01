@@ -16,10 +16,13 @@ import java.util.Set;
 import threeblindmice.setitup.events.AddContactEvent;
 import threeblindmice.setitup.events.RemoveContactEvent;
 
+
 public class LocalContactThread extends Thread {
 
     private static final int UPDATE_PERIOD = 10000; // milliseconds
     private Context mContext;
+    private threeblindmice.setitup.util.State state = threeblindmice.setitup.util.State.INIT;
+    private boolean init = true;
 
 
     public LocalContactThread(Context context){
@@ -48,26 +51,29 @@ public class LocalContactThread extends Thread {
                     EventBus.getDefault().post(new AddContactEvent(tempContact));
                 }
                 */
-
+                System.out.println("Parse Contact Set");
                 Set<Contact> tempBase = new HashSet<>(baseSet);
                 baseSet.removeAll(newSet);
                 Set<Contact> contactsToRemove = baseSet;
                 newSet.removeAll(tempBase);
                 Set<Contact> contactsToAdd = newSet;
 
-                //  Only preforming operations on new or updating Contacts saves RecyclerViewer
-                //  transactions and supports add() and remove() animations
+                    //  Only preforming operations on new or updating Contacts saves RecyclerViewer
+                    //  transactions and supports add() and remove() animations
 
-                for (Iterator<Contact> i = contactsToAdd.iterator(); i.hasNext(); ) {
-                    Contact item = i.next();
-                    EventBus.getDefault().post(new AddContactEvent(item));
+                    for (Iterator<Contact> i = contactsToAdd.iterator(); i.hasNext(); ) {
+                        Contact item = i.next();
+                        System.out.println("Local thread add contact");
+                        EventBus.getDefault().post(new AddContactEvent(item));
 
-                }
-                for (Iterator<Contact> i = contactsToRemove.iterator(); i.hasNext(); ) {
-                    Contact item = i.next();
-                    EventBus.getDefault().post(new RemoveContactEvent(item));
+                    }
+                    for (Iterator<Contact> i = contactsToRemove.iterator(); i.hasNext(); ) {
+                        Contact item = i.next();
+                        EventBus.getDefault().post(new RemoveContactEvent(item));
 
-                }
+                    }
+
+
 
                 //  Reset T1
                 baseSet = new HashSet<>(queryAllContacts());
@@ -106,9 +112,11 @@ public class LocalContactThread extends Thread {
                         pCur.close();
                     }
                     contacts.add(tempContact);
-                    // TODO: Check if this just creates pointers to one contact
-                    EventBus.getDefault().post(new AddContactEvent(tempContact));
                 }
+            }
+            if(init){
+
+                EventBus.getDefault().post(new AddContactEvent(contacts));
             }
 
         return contacts;
