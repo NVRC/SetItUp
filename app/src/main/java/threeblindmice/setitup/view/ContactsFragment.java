@@ -93,7 +93,6 @@ public class ContactsFragment extends Fragment {
 
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onUpdate(RefreshContactListEvent event){
-        System.out.println("\t\tAdd flag:\t "+event.getFlag());
         State tempState = event.getState();
 
         if(tempState == State.INIT){
@@ -108,7 +107,6 @@ public class ContactsFragment extends Fragment {
                 mContactAdapter.addItem(contact);
                 //  mContactsAdapter.getCallback.batchedCallback.dispatchLastEvent();
 
-                System.out.println("\t\t Add Event:\t"+contact.getName());
 
                 /*
                 if(currSortedSet.add(contact)){
@@ -123,8 +121,7 @@ public class ContactsFragment extends Fragment {
 
                 mContactAdapter.removeItem(contact);
                 //batchedCallback.dispatchLastEvent();
-                System.out.println("\t\t Rm:" +
-                        " Event :\t"+contact.getName());
+
                 /*
                 pos = currData.indexOf(contact);
                 if(pos >- 1){
@@ -190,7 +187,7 @@ public class ContactsFragment extends Fragment {
 
                 @Override
                 public int compare(Contact item1, Contact item2) {
-                    return item1.getName().compareTo(item2.getName());
+                    return item1.getName().compareToIgnoreCase(item2.getName());
                 }
 
 
@@ -212,18 +209,7 @@ public class ContactsFragment extends Fragment {
         public void addAll(List<Contact> contacts) {
             System.out.println("Contacts:\n"+contacts);
             mData.addAll(contacts);
-            /*
-            mData.beginBatchedUpdates();
-            for (int i = 0; i < contacts.size(); i++) {
-                mData.add(contacts.get(i));
-            }
-            mData.endBatchedUpdates();
-            */
-            System.out.println("mData:\n");
-            for (int i = 0; i < mData.size(); i++){
 
-                System.out.println(mData.get(i).toString());
-            }
         }
 
 

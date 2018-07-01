@@ -5,11 +5,13 @@ android {
     buildToolsVersion '27.0.3'
     defaultConfig {
         applicationId "threeblindmice.setitup"
-        minSdkVersion 15
+        minSdkVersion 26
         targetSdkVersion 27
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        vectorDrawables.useSupportLibrary = true
+
     }
     buildTypes {
         release {
@@ -28,8 +30,13 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
 
-    implementation 'com.android.support:recyclerview-v7:27.1.1'
-    implementation 'com.android.support:appcompat-v7:27.+'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
+    implementation 'com.android.support:design:27.1.0'
+    implementation 'com.android.support:recyclerview-v7:27.1.0'
+    implementation 'com.android.support:appcompat-v7:27.1.0'
+    implementation 'org.apache.commons:commons-lang3:3.7'
+    implementation 'org.apache.commons:commons-collections4:4.1'
+    implementation 'org.greenrobot:eventbus:3.1.1'
+    //implementation 'com.google.guava:guava:25.1-jre'
+    implementation 'com.afollestad.material-dialogs:core:0.9.6.0'
     testImplementation 'junit:junit:4.12'
 }

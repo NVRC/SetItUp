@@ -51,7 +51,7 @@ public class LocalContactThread extends Thread {
                     EventBus.getDefault().post(new AddContactEvent(tempContact));
                 }
                 */
-                System.out.println("Parse Contact Set");
+
                 Set<Contact> tempBase = new HashSet<>(baseSet);
                 baseSet.removeAll(newSet);
                 Set<Contact> contactsToRemove = baseSet;

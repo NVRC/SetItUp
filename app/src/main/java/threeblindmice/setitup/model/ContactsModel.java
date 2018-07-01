@@ -78,10 +78,9 @@ public class ContactsModel {
     public void updateContact(AddContactEvent newEvent) {
         boolean listFlag = newEvent.getListFlag();
         if (state == threeblindmice.setitup.util.State.INIT && listFlag) {
-            System.out.println(newEvent.getContacts());
+
             EventBus.getDefault().post(new RefreshContactListEvent(newEvent.getContacts(),
                     threeblindmice.setitup.util.State.INIT));
-            System.out.println("Post to UI");
             state = threeblindmice.setitup.util.State.SINGLE;
         } else if(state ==threeblindmice.setitup.util.State.SINGLE && !listFlag){
             Contact c = newEvent.getContact();

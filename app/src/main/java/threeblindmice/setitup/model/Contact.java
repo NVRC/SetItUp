@@ -71,7 +71,7 @@ public class Contact  implements Comparable<String>{
 
     @Override
     public int compareTo(String nameAlt){
-        return this.name.compareTo(nameAlt);
+        return this.name.compareToIgnoreCase(nameAlt);
     }
 
     @TargetApi(26)
