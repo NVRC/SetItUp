@@ -134,7 +134,6 @@ public class NavDrawerFragment extends Fragment implements NavInterface {
                                 //  Create an account in AccountManager
                             }
                         })
-
                 .show();
             }
         });

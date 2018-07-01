@@ -51,14 +51,20 @@ public class ContactsModel {
 
 
     public List<Contact> getAlphaSortedList(){
-        List<Contact> temp = new ArrayList<Contact>(contactList);
-                Collections.sort(temp, new Comparator<Contact>() {
-            @Override
-            public int compare(Contact c1, Contact c2) {
-                return c1.compareTo(c2.getName());
+        List<Contact> temp;
+        //  TODO: Purge
+        if (contactList != null) {
+            temp = new ArrayList<Contact>(contactList);
+            Collections.sort(temp, new Comparator<Contact>() {
+                @Override
+                public int compare(Contact c1, Contact c2) {
+                    return c1.compareTo(c2.getName());
 
-            }
-        });
+                }
+            });
+        } else  {
+            temp = new ArrayList<>();
+        }
     return temp;
     }
 

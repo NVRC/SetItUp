@@ -3,8 +3,10 @@ package threeblindmice.setitup.view;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.util.SortedList;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.util.SortedListAdapterCallback;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +16,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.List;
+import java.util.TreeSet;
 
 import threeblindmice.setitup.R;
 import threeblindmice.setitup.databinding.FragmentContactsBinding;
@@ -31,6 +34,10 @@ public class ContactsFragment extends Fragment {
     private ContactsModel mContactsModel;
     private ContactAdapter mContactAdapter;
     private List<Contact> currData;
+    private TreeSet<Contact> currSortedSet;
+    private SortedList<Contact> sortedList;
+    private boolean likelyUnsorted = false;
+    private SortedList.BatchedCallback<Contact> batchedCallback;
 
 
 
@@ -42,6 +49,7 @@ public class ContactsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         FragmentContactsBinding binding = DataBindingUtil
                 .inflate(inflater, R.layout.fragment_contacts, container, false);
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -57,8 +65,38 @@ public class ContactsFragment extends Fragment {
         super.onCreate(savedInstanceState);
         EventBus.getDefault().register(this);
         mContactsModel = new ContactsModel(getActivity());
-        currData = mContactsModel.getContacts();
-        mContactAdapter = new ContactAdapter(currData);
+        mContactAdapter = new ContactAdapter();
+
+        batchedCallback = new SortedList.BatchedCallback<>(
+                new SortedListAdapterCallback<Contact>(mContactAdapter){
+                    @Override
+                    public boolean areContentsTheSame(Contact a1, Contact a2) {
+                        if(compare(a1,a2) == 0){
+                            return true;
+                        }
+                        return false;
+                    }
+                    @Override
+                    public boolean areItemsTheSame(Contact a1, Contact a2) {
+                        if(a1 instanceof Contact && a2 instanceof Contact){
+                            return true;
+                        }
+                        return false;
+                    }
+
+                    @Override
+                    public void onInserted(int position, int count){
+                        super.onInserted(position, count);
+                    }
+
+                    @Override
+                    public int compare(Contact item1, Contact item2) {
+                        return item1.getName().compareTo(item2.getName());
+                    }
+                });
+        sortedList = new SortedList<>(Contact.class, batchedCallback);
+        mContactAdapter.setList(sortedList);
+
     }
 
 
@@ -75,27 +113,51 @@ public class ContactsFragment extends Fragment {
         super.onDestroy();
     }
 
+    private void syncSorted(){
+
+    }
 
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
+    @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onUpdate(RefreshContactListEvent event){
 
         Contact contact = event.getContact();
+
+
+
         int pos;
         if(event.getFlag()){
             //  Add condition
-                currData.add(contact);
+            sortedList.add(contact);
+            batchedCallback.dispatchLastEvent();
+
+            System.out.println("\t\t Add Event Occured"+contact.getName());
+            System.out.println("\t\t sortedList:"+sortedList.toString()
+            );
+            /*
+            if(currSortedSet.add(contact)){
+                currData = new ArrayList<Contact>(currSortedSet);
                 pos = currData.indexOf(contact);
                 mContactAdapter.notifyItemInserted(pos);
+            }
+            */
 
         } else {
             //  Remove condition
+            sortedList.remove(contact);
+            batchedCallback.dispatchLastEvent();
+            System.out.println("\t\t Rm" +
+                    " Event Occured"+contact.getName());
+            /*
             pos = currData.indexOf(contact);
             if(pos >- 1){
-                currData.remove(pos);
-                mContactAdapter.notifyItemRemoved(pos);
-                mContactAdapter.notifyItemRangeChanged(pos, currData.size());
+                if(currSortedSet.remove(contact)) {
+                    currData = new ArrayList<Contact>(currSortedSet);
+                    mContactAdapter.notifyItemRemoved(pos);
+                    mContactAdapter.notifyItemRangeChanged(pos, currData.size());
+                }
             }
+            */
 
         }
     }
@@ -120,13 +182,16 @@ public class ContactsFragment extends Fragment {
     }
 
     private class ContactAdapter extends RecyclerView.Adapter<ContactHolder>{
-        private List<Contact> mContacts;
+        private SortedList<Contact> mContacts;
 
 
-        public ContactAdapter(List<Contact> contacts){
-            mContacts = contacts;
+        public ContactAdapter(){
+
         }
 
+        public void setList(SortedList<Contact> contacts){
+            this.mContacts = contacts;
+        }
         @Override
         public ContactHolder onCreateViewHolder(ViewGroup parent, int viewType){
             LayoutInflater inflater = LayoutInflater.from(getActivity());
