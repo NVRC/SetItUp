@@ -25,8 +25,15 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+
 import threeblindmice.setitup.R;
 import threeblindmice.setitup.events.UpdateFragmentEvent;
+import threeblindmice.setitup.events.UpdateTokenEvent;
 
 
 /**
@@ -53,6 +60,7 @@ public class ContactsActivity extends AppCompatActivity {
     //  Persistent Objects
     private DrawerLayout drawerLayout;
     private ContactsFragment cf;
+    private String currToken;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -146,6 +154,10 @@ public class ContactsActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+    @Subscribe(threadMode = ThreadMode.BACKGROUND)
+    public void onTokenSet(UpdateTokenEvent event){
+        this.currToken = event.getToken();
+    }
 
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onFragmentUpdate(UpdateFragmentEvent event){
@@ -155,7 +167,6 @@ public class ContactsActivity extends AppCompatActivity {
         String tag = event.getTag();
         FragmentManager fragmentManager = getSupportFragmentManager();
         if (tag.equals(TAG_CONTACTS_FRAGMENT)){
-            //  TODO: Refactor to use the same ContactsFragment
 
             Fragment frag = fragmentManager.findFragmentByTag(TAG_EMPTY_FRAGMENT);
             if(frag != null && frag.isVisible()){
@@ -187,7 +198,31 @@ public class ContactsActivity extends AppCompatActivity {
         if (requestCode == AUTH_REQUEST){
             if (resultCode == RESULT_OK){
                 //  New Auth token
+                URL url = null;
+                try {
+                     url = new URL("https://www.googleapis.com/tasks/v1/users/@me/lists?key=" + getString(R.string.api_key));
+                } catch (MalformedURLException e){
+                    e.printStackTrace();
+                    //  TODO: Handle error
+                    //  call dialog
+                }
+                URLConnection conn;
 
+                try {
+                     conn = (HttpURLConnection) url.openConnection();
+                } catch (IOException e){
+                    e.printStackTrace();
+                    return;
+                }
+                conn.addRequestProperty("client_id", getString(R.string.google_client_id));
+                conn.addRequestProperty("client_secret", getString(R.string.google_client_secret));
+                conn.setRequestProperty("Authorization", "OAuth " + currToken);
+                try{
+                    conn.connect();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    //  TODO: Handle error
+                }
             }
 
         }
