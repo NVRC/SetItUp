@@ -31,6 +31,7 @@ import java.util.List;
 
 import threeblindmice.setitup.R;
 import threeblindmice.setitup.events.UpdateFragmentEvent;
+import threeblindmice.setitup.events.UpdateTokenEvent;
 import threeblindmice.setitup.interfaces.NavInterface;
 import threeblindmice.setitup.listeners.OptionClickListener;
 
@@ -47,6 +48,8 @@ public class NavDrawerFragment extends Fragment implements NavInterface {
     private static final int CONST_OPTIONS_ELEMENT_OFFSET = 4;
 
     private static final int AUTH_REQUEST = 0;
+
+
 
 
 
@@ -163,23 +166,20 @@ public class NavDrawerFragment extends Fragment implements NavInterface {
         Bundle options = new Bundle();
         //  Currently just selects the first account for testing
         Account[] accounts = am.getAccountsByType(GOOGLE_ACC_TYPE);
+        String AUTH_TOKEN_TYPE = "cp";
+
         for (Account acc : accounts){
             if(acc.name.equals(targetName)){
                 //  TODO: Implement error handling
                 am.getAuthToken(
                         acc,                     // Account retrieved using getAccountsByType()
-                        "Schedule To Meet Up",            // Auth scope
+                        AUTH_TOKEN_TYPE,            // Auth scope
                         options,                        // Authenticator-specific options
                         getActivity(),                           // Your activity
                         new OnTokenAcquired(),          // Callback called when a token is successfully acquired
                         new Handler(new onError()));    // Callback called if an error occurs
             }
         }
-
-
-
-
-
 
     }
 
@@ -218,6 +218,8 @@ public class NavDrawerFragment extends Fragment implements NavInterface {
             // is stored in the constant AccountManager.KEY_AUTHTOKEN.
             if (bundle != null) {
                 String token = bundle.getString(AccountManager.KEY_AUTHTOKEN);
+                EventBus.getDefault().post(new UpdateTokenEvent(token));
+
                 Intent launch = null;
                 try {
                     launch = (Intent) result.getResult().get(AccountManager.KEY_INTENT);

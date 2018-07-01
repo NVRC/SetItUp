@@ -1,7 +1,6 @@
 package threeblindmice.setitup.view;
 
 import android.Manifest;
-import android.accounts.AccountManager;
 import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -42,7 +41,7 @@ public class ContactsActivity extends AppCompatActivity {
     private static final String TAG_CONTACTS_FRAGMENT = "Contacts";
     private static final String TAG_NAV_FRAGMENT = "Nav";
     private static final int AUTH_REQUEST = 0;
-
+    private static final String GOOGLE_ACC_TYPE = "com.google";
 
     // Defines the id of the loader for later reference
     public static final int CONTACT_LOADER_ID = 78;
@@ -181,13 +180,14 @@ public class ContactsActivity extends AppCompatActivity {
 
 
 
+
+
     @Override
     protected void onActivityResult(int requestCode,int resultCode, Intent intent){
         if (requestCode == AUTH_REQUEST){
             if (resultCode == RESULT_OK){
                 //  New Auth token
-                AccountManager am = AccountManager.get(this);
-                // am.getAuthToken();
+
             }
 
         }
