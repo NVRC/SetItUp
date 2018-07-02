@@ -18,12 +18,14 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
 
 import threeblindmice.setitup.R;
 import threeblindmice.setitup.databinding.FragmentContactsBinding;
 import threeblindmice.setitup.databinding.ItemContactBinding;
+import threeblindmice.setitup.events.QueryEvent;
 import threeblindmice.setitup.events.RefreshContactListEvent;
 import threeblindmice.setitup.model.Contact;
 import threeblindmice.setitup.model.ContactsModel;
@@ -41,7 +43,7 @@ public class ContactsFragment extends Fragment {
     private TreeSet<Contact> currSortedSet;
     private SortedList<Contact> sortedList;
     private boolean likelyUnsorted = false;
-
+    private FragmentContactsBinding binding;
 
 
 
@@ -54,13 +56,16 @@ public class ContactsFragment extends Fragment {
                              Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        FragmentContactsBinding binding = DataBindingUtil
+        binding = DataBindingUtil
                 .inflate(inflater, R.layout.fragment_contacts, container, false);
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         binding.recyclerView.setAdapter(mContactAdapter);
         FastScroller fastScroller = getActivity().findViewById(R.id.fastscroll);
         fastScroller.setRecyclerView(binding.recyclerView);
+
+
+
         return binding.getRoot();
     }
 
@@ -73,9 +78,40 @@ public class ContactsFragment extends Fragment {
 
 
 
+    }
 
+    @Override
+    public void onStart(){
+        super.onStart();
 
     }
+
+    private List<Contact> filter(List<Contact> contacts, String query){
+
+        List<Contact> filteredModelList = new ArrayList<>();
+        for (Contact contact : contacts) {
+            String text = contact.getName().toLowerCase();
+            if (text.contains(query.toLowerCase())) {
+                filteredModelList.add(contact);
+            }
+        }
+        return filteredModelList;
+
+    }
+
+    @Subscribe
+    public void handleQueryEvent(QueryEvent event){
+        // Here is where we are going to implement the filter logic
+        List<Contact> filteredModelList = filter(mContactAdapter.getDataList(), event.getQuery());
+        if(filteredModelList.size() > 0){
+            mContactAdapter.clear();
+            mContactAdapter.addAll(filteredModelList);
+        }
+        binding.recyclerView.scrollToPosition(0);
+    }
+
+
+
 
 
     //  Save states
@@ -86,14 +122,9 @@ public class ContactsFragment extends Fragment {
     }
     @Override
     public void onDestroy() {
-
-
         super.onDestroy();
     }
 
-    private void syncSorted(){
-
-    }
 
 
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
@@ -163,11 +194,12 @@ public class ContactsFragment extends Fragment {
 
     private class ContactAdapter extends RecyclerView.Adapter<ContactHolder> implements SectionTitleProvider{
         private SortedList<Contact> mData;
+        private ArrayList<Contact> duplicateData;
         private SortedList.BatchedCallback<Contact> batchedCallback;
 
         public ContactAdapter(){
 
-
+            duplicateData = new ArrayList<>();
             mData = new SortedList<>(Contact.class, new SortedListAdapterCallback<Contact>(this){
                 @Override
                 public boolean areContentsTheSame(Contact a1, Contact a2) {
@@ -210,6 +242,10 @@ public class ContactsFragment extends Fragment {
 
         }
 
+        public List<Contact> getDataList(){
+            return duplicateData;
+        }
+
         @Override
         public String getSectionTitle(int position) {
             //this String will be shown in a bubble for specified position
@@ -220,6 +256,7 @@ public class ContactsFragment extends Fragment {
         //  Helpers
         public void addAll(List<Contact> contacts) {
             mData.addAll(contacts);
+            duplicateData.addAll(contacts);
 
         }
 
@@ -254,10 +291,12 @@ public class ContactsFragment extends Fragment {
 
         public void addItem(Contact c){
             mData.add(c);
+            duplicateData.add(c);
             //batchedCallback.dispatchLastEvent();
         }
         public void removeItem(Contact c){
             mData.remove(c);
+            duplicateData.remove(c);
             //batchedCallback.dispatchLastEvent();
         }
     }

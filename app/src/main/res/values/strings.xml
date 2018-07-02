@@ -10,4 +10,5 @@
     <string name="acc_dialog_title">Select Account</string>
     <string name="cancel">Cancel</string>
     <string name="add_acc">Add Account</string>
+    <string name="search_hint">Find a contact</string>
 </resources>
