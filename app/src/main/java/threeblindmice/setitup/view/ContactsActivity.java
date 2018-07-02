@@ -156,9 +156,9 @@ public class ContactsActivity extends AppCompatActivity {
         ImageView searchInner = (ImageView)searchView.findViewById(android.support.v7.appcompat.R.id.search_mag_icon);
 
         SearchView.SearchAutoComplete theTextArea = (SearchView.SearchAutoComplete)searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
-        theTextArea.setTextColor(ResourcesCompat.getColor(getResources(), R.color.primary_text, null));
-        searchEditText.setTextColor(ResourcesCompat.getColor(getResources(), R.color.primary_text, null));
-        searchEditText.setHintTextColor(ResourcesCompat.getColor(getResources(), R.color.primary_text, null));
+        theTextArea.setTextColor(ResourcesCompat.getColor(getResources(), R.color.primary_light, null));
+        searchEditText.setTextColor(ResourcesCompat.getColor(getResources(), R.color.primary_light, null));
+        searchEditText.setHintTextColor(ResourcesCompat.getColor(getResources(), R.color.primary_light, null));
 
 
         searchCloseButton.setImageResource(R.drawable.close_icon);
