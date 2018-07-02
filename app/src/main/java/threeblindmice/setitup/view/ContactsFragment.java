@@ -11,6 +11,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.futuremind.recyclerviewfastscroll.FastScroller;
+import com.futuremind.recyclerviewfastscroll.SectionTitleProvider;
+
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -56,8 +59,8 @@ public class ContactsFragment extends Fragment {
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         binding.recyclerView.setAdapter(mContactAdapter);
-
-
+        FastScroller fastScroller = getActivity().findViewById(R.id.fastscroll);
+        fastScroller.setRecyclerView(binding.recyclerView);
         return binding.getRoot();
     }
 
@@ -67,6 +70,8 @@ public class ContactsFragment extends Fragment {
         EventBus.getDefault().register(this);
         mContactAdapter = new ContactAdapter();
         mContactsModel = new ContactsModel(getActivity());
+
+
 
 
 
@@ -97,7 +102,6 @@ public class ContactsFragment extends Fragment {
 
         if(tempState == State.INIT){
             mContactAdapter.clear();
-            System.out.println(event.getContacts());
             mContactAdapter.addAll(event.getContacts());
         } else if (tempState == State.SINGLE){
             int pos;
@@ -157,7 +161,7 @@ public class ContactsFragment extends Fragment {
         }
     }
 
-    private class ContactAdapter extends RecyclerView.Adapter<ContactHolder>{
+    private class ContactAdapter extends RecyclerView.Adapter<ContactHolder> implements SectionTitleProvider{
         private SortedList<Contact> mData;
         private SortedList.BatchedCallback<Contact> batchedCallback;
 
@@ -202,21 +206,27 @@ public class ContactsFragment extends Fragment {
                 }
             });
 
+
+
+        }
+
+        @Override
+        public String getSectionTitle(int position) {
+            //this String will be shown in a bubble for specified position
+            return mData.get(position).getName().substring(0, 1);
         }
 
 
         //  Helpers
         public void addAll(List<Contact> contacts) {
-            System.out.println("Contacts:\n"+contacts);
             mData.addAll(contacts);
 
         }
 
 
-
         public void clear() {
             mData.beginBatchedUpdates();
-            //remove items at end, to avoid unnecessary array shifting
+            //  Remove terminating items to avoid array reshuffling
             while (mData.size() > 0) {
                 mData.removeItemAt(mData.size() - 1);
             }

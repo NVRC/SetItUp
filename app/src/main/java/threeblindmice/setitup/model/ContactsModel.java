@@ -78,8 +78,15 @@ public class ContactsModel {
     public void updateContact(AddContactEvent newEvent) {
         boolean listFlag = newEvent.getListFlag();
         if (state == threeblindmice.setitup.util.State.INIT && listFlag) {
+            //  TODO: Remove test Contacts
+            char[] alpha = "abcdefghijklmnopqrstuvwxyz".toCharArray();
+            List<Contact> load = new ArrayList<>();
+            for(int i = 0; i < alpha.length; i++ ){
+                load.add(new Contact(Character.toString(alpha[i])));
+            }
 
-            EventBus.getDefault().post(new RefreshContactListEvent(newEvent.getContacts(),
+            load.addAll(newEvent.getContacts());
+            EventBus.getDefault().post(new RefreshContactListEvent(load,
                     threeblindmice.setitup.util.State.INIT));
             state = threeblindmice.setitup.util.State.SINGLE;
         } else if(state ==threeblindmice.setitup.util.State.SINGLE && !listFlag){

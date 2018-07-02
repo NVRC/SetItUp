@@ -63,7 +63,6 @@ public class LocalContactThread extends Thread {
 
                     for (Iterator<Contact> i = contactsToAdd.iterator(); i.hasNext(); ) {
                         Contact item = i.next();
-                        System.out.println("Local thread add contact");
                         EventBus.getDefault().post(new AddContactEvent(item));
 
                     }
