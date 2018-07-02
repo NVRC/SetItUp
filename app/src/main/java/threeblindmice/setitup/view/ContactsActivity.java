@@ -25,15 +25,8 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
-
 import threeblindmice.setitup.R;
 import threeblindmice.setitup.events.UpdateFragmentEvent;
-import threeblindmice.setitup.events.UpdateTokenEvent;
 
 
 /**
@@ -48,6 +41,7 @@ public class ContactsActivity extends AppCompatActivity {
     private static final String TAG_CONTACTS_FRAGMENT = "Contacts";
     private static final String TAG_NAV_FRAGMENT = "Nav";
     private static final int AUTH_REQUEST = 0;
+
     private static final String GOOGLE_ACC_TYPE = "com.google";
 
     // Defines the id of the loader for later reference
@@ -64,6 +58,7 @@ public class ContactsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contacts);
 
@@ -133,6 +128,7 @@ public class ContactsActivity extends AppCompatActivity {
 
         }
 
+
     }
 
     @Override
@@ -154,10 +150,7 @@ public class ContactsActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
-    @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    public void onTokenSet(UpdateTokenEvent event){
-        this.currToken = event.getToken();
-    }
+
 
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onFragmentUpdate(UpdateFragmentEvent event){
@@ -189,45 +182,15 @@ public class ContactsActivity extends AppCompatActivity {
     }
 
 
-
-
-
-
     @Override
-    protected void onActivityResult(int requestCode,int resultCode, Intent intent){
-        if (requestCode == AUTH_REQUEST){
-            if (resultCode == RESULT_OK){
-                //  New Auth token
-                URL url = null;
-                try {
-                     url = new URL("https://www.googleapis.com/tasks/v1/users/@me/lists?key=" + getString(R.string.api_key));
-                } catch (MalformedURLException e){
-                    e.printStackTrace();
-                    //  TODO: Handle error
-                    //  call dialog
-                }
-                URLConnection conn;
-
-                try {
-                     conn = (HttpURLConnection) url.openConnection();
-                } catch (IOException e){
-                    e.printStackTrace();
-                    return;
-                }
-                conn.addRequestProperty("client_id", getString(R.string.google_client_id));
-                conn.addRequestProperty("client_secret", getString(R.string.google_client_secret));
-                conn.setRequestProperty("Authorization", "OAuth " + currToken);
-                try{
-                    conn.connect();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    //  TODO: Handle error
-                }
-            }
-
-        }
+    public void onActivityResult(int requestCode,int resultCode, Intent intent){
+        super.onActivityResult(requestCode,resultCode,intent);
 
     }
+
+
+
+
 
 
 
