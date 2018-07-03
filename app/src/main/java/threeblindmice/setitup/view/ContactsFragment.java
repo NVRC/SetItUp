@@ -64,8 +64,6 @@ public class ContactsFragment extends Fragment {
         FastScroller fastScroller = getActivity().findViewById(R.id.fastscroll);
         fastScroller.setRecyclerView(binding.recyclerView);
 
-
-
         return binding.getRoot();
     }
 
@@ -75,9 +73,6 @@ public class ContactsFragment extends Fragment {
         EventBus.getDefault().register(this);
         mContactAdapter = new ContactAdapter();
         mContactsModel = new ContactsModel(getActivity());
-
-
-
     }
 
     @Override
@@ -182,7 +177,7 @@ public class ContactsFragment extends Fragment {
         private ContactHolder(ItemContactBinding binding){
             super(binding.getRoot());
             mBinding = binding;
-            mBinding.setViewModel(new ContactViewModel());
+            mBinding.setViewModel(new ContactViewModel(getActivity()));
 
         }
 

@@ -59,6 +59,8 @@ public class ContactsActivity extends AppCompatActivity {
     // Identifier for the permission request
     private static final int READ_CONTACTS_PERMISSIONS_REQUEST = 1;
 
+
+
     //  Persistent Objects
     private DrawerLayout drawerLayout;
     private ContactsFragment cf;
@@ -134,6 +136,8 @@ public class ContactsActivity extends AppCompatActivity {
 
         }
     }
+
+
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {

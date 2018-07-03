@@ -1,6 +1,7 @@
 package threeblindmice.setitup.model;
 
 import android.annotation.TargetApi;
+import android.graphics.Bitmap;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -19,6 +20,7 @@ public class Contact  implements Comparable<String>{
 
     private String name;
     private String hash;
+    private Bitmap photo;
 
     // Perhaps a PhoneNumber object should be created, but the expression is so varied
     // REGEX to valid later
@@ -37,13 +39,20 @@ public class Contact  implements Comparable<String>{
         this.hash = generateHash(generateDigest());
     }
 
-
     private String generateDigest(){
         return name;
     }
 
     public String getName(){
         return name;
+    }
+
+    public void setPhoto(Bitmap newPhoto){
+        this.photo = newPhoto;
+    }
+
+    public Bitmap getPhoto(){
+        return photo;
     }
 
     public HashSet<String> getNumbers(){
