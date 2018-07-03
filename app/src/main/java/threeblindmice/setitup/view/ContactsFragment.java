@@ -153,7 +153,7 @@ public class ContactsFragment extends Fragment {
         private ContactHolder(ItemContactBinding binding){
             super(binding.getRoot());
             mBinding = binding;
-            mBinding.setViewModel(new ContactViewModel(getActivity()));
+            mBinding.setViewModel(new ContactViewModel());
 
         }
 

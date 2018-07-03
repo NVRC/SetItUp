@@ -16,7 +16,7 @@ public final class ImageBinder {
     @BindingAdapter("bind:imageBitmap")
     public static void loadImage(ImageView iv, Bitmap bitmap) {
         if (bitmap == null){
-            iv.setImageResource(R.drawable.close_icon);
+            iv.setImageResource(R.drawable.wallpaper_icon);
         } else {
             iv.setImageBitmap(bitmap);
         }

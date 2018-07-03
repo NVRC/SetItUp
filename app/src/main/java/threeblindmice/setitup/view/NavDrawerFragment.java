@@ -25,21 +25,31 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import org.greenrobot.eventbus.EventBus;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
 import threeblindmice.setitup.R;
 import threeblindmice.setitup.events.UpdateFragmentEvent;
+import threeblindmice.setitup.events.UpdateTokenEvent;
 import threeblindmice.setitup.interfaces.NavInterface;
 import threeblindmice.setitup.listeners.OptionClickListener;
+
+import static android.app.Activity.RESULT_OK;
 
 
 public class NavDrawerFragment extends Fragment implements NavInterface {
 
     //  Constants
     private static final String GOOGLE_ACC_TYPE = "com.google";
+    private static final int CONST_OPTIONS_ELEMENT_OFFSET = 4;
     private static final int AUTH_REQUEST = 0;
 
+    //  Dynamic vars
+    private String currToken;
 
     public static NavDrawerFragment newInstance(){
         return new NavDrawerFragment();
@@ -48,6 +58,7 @@ public class NavDrawerFragment extends Fragment implements NavInterface {
     @Override
     public void onCreate(Bundle bundle){
         super.onCreate(bundle);
+
     }
 
     @Override
@@ -118,6 +129,7 @@ public class NavDrawerFragment extends Fragment implements NavInterface {
                             @Override
                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                                 //  Create an account in AccountManager
+                                //
                             }
                         })
                 .show();
@@ -141,20 +153,25 @@ public class NavDrawerFragment extends Fragment implements NavInterface {
 
     //  Takes a name referenced by an Account in AccountManager
     private void startGoogleAuth(CharSequence targetName){
+
+        tokenEvent = new UpdateTokenEvent();
+        tokenEvent.addEmail(targetName.toString());
+
         AccountManager am = AccountManager.get(getActivity());
         Bundle options = new Bundle();
 
         //  TODO: check for other account types e.g. Facebook "com.facebook.auth.login"
         Account[] accounts = am.getAccountsByType(GOOGLE_ACC_TYPE);
+        String AUTH_TOKEN_TYPE = "cp";
         for (Account acc : accounts){
             if(acc.name.equals(targetName)){
                 //  Get Account object from AccountManager
                 //  TODO: Implement error handling
                 am.getAuthToken(
-                        acc,
-                        "Schedule To Meet Up",  // Auth scope
-                        options,                        // Authenticator-specific options
-                        getActivity(),
+                        acc,                            //  Account retrieved using getAccountsByType()
+                        AUTH_TOKEN_TYPE,                //  Auth scope
+                        options,                        //  Authenticator-specific options
+                        getActivity(),                  
                         new OnTokenAcquired(),          // Callback on token success
                         new Handler(new onError()));    // Callback if an error occurred
             }
@@ -167,6 +184,54 @@ public class NavDrawerFragment extends Fragment implements NavInterface {
     public void onOptionSelected(String id){
         EventBus.getDefault().post(new UpdateFragmentEvent(id));
     }
+
+    @Override
+    public void onActivityResult(int requestCode,int resultCode, Intent intent){
+
+        System.out.println("Entered onActivityResult()");
+        System.out.println(requestCode);
+        System.out.println(resultCode);
+
+        if (requestCode == AUTH_REQUEST){
+            System.out.println("Passed AUTH_REQUEST");
+            if (resultCode == RESULT_OK){
+                //  New Auth token
+                System.out.println("Passed RESULT_OK");
+                System.out.println("Google URL attempt");
+                URL url = null;
+                try {
+                    url = new URL("https://www.googleapis.com/tasks/v1/users/@me/lists?key=" + getString(R.string.api_key));
+                } catch (MalformedURLException e){
+                    e.printStackTrace();
+                    //  TODO: Handle error
+                    //  call dialog
+                }
+                URLConnection conn;
+
+                try {
+                    conn = (HttpURLConnection) url.openConnection();
+                } catch (IOException e){
+                    e.printStackTrace();
+                    return;
+                }
+                conn.addRequestProperty("client_id", getString(R.string.google_client_id));
+                conn.addRequestProperty("client_secret", getString(R.string.google_client_secret));
+                conn.setRequestProperty("Authorization", "OAuth " + currToken);
+                try{
+                    conn.connect();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    //  TODO: Handle error
+                }
+            }
+
+        }
+        super.onActivityResult(requestCode,resultCode,intent);
+
+    }
+
+
+
 
 
     //  Temporary Error handling mechanism for authentication
@@ -196,6 +261,10 @@ public class NavDrawerFragment extends Fragment implements NavInterface {
             // is stored in the constant AccountManager.KEY_AUTHTOKEN.
             if (bundle != null) {
                 String token = bundle.getString(AccountManager.KEY_AUTHTOKEN);
+                tokenEvent.addToken(token);
+                currToken = token;
+                EventBus.getDefault().post(tokenEvent);
+
                 Intent launch = null;
                 try {
                     launch = (Intent) result.getResult().get(AccountManager.KEY_INTENT);
@@ -207,8 +276,13 @@ public class NavDrawerFragment extends Fragment implements NavInterface {
                     e.printStackTrace();
                 }
                 if (launch != null) {
+
+
                     startActivityForResult(launch, AUTH_REQUEST);
-                    return;
+
+                } else {
+                    //  Authentication Token Already Captured
+                    System.out.println("\t\tALT");
                 }
             }
         }

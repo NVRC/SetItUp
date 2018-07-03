@@ -1,6 +1,8 @@
 package threeblindmice.setitup.model;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -11,6 +13,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+import threeblindmice.setitup.R;
 import threeblindmice.setitup.events.AddContactEvent;
 import threeblindmice.setitup.events.RefreshContactListEvent;
 import threeblindmice.setitup.events.RemoveContactEvent;
@@ -86,9 +89,13 @@ public class ContactsModel {
             //  Build a temporary test load of Contacts
             //  TODO: Remove test Contacts on deployment
             char[] alpha = "abcdefghijklmnopqrstuvwxyz".toCharArray();
+            Bitmap bitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.wallpaper_icon);
             List<Contact> load = new ArrayList<>();
             for(int i = 0; i < alpha.length; i++ ){
-                load.add(new Contact(Character.toString(alpha[i])));
+                //  Awful one liner to create beefier names for testing
+                Contact c =  new Contact(new String(new char[12]).replace("\0", Character.toString(alpha[i])));
+                c.setPhoto(bitmap);
+                load.add(c);
             }
             load.addAll(newEvent.getContacts());
             EventBus.getDefault().post(new RefreshContactListEvent(load,
