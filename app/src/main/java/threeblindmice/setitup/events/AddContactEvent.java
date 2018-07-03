@@ -1,5 +1,7 @@
 package threeblindmice.setitup.events;
 
+import java.util.List;
+
 import threeblindmice.setitup.model.Contact;
 
 /**
@@ -8,11 +10,24 @@ import threeblindmice.setitup.model.Contact;
 
 public class AddContactEvent {
     private Contact contact;
-
+    private List<Contact> contacts;
+    private boolean flag;
     public AddContactEvent(Contact obj){
-        if(obj instanceof Contact){
-            contact = obj;
-        }
+
+            this.contact = obj;
+            this.flag = false;
+
+    }
+    public AddContactEvent(List<Contact> list){
+        this.contacts = list;
+        this.flag = true;
+    }
+    public boolean getListFlag(){
+        return flag;
+    }
+
+    public List<Contact> getContacts(){
+        return contacts;
     }
 
     public Contact getContact(){

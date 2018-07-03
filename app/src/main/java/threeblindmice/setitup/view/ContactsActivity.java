@@ -2,6 +2,9 @@ package threeblindmice.setitup.view;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.app.SearchManager;
+import android.app.SearchableInfo;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -11,14 +14,18 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import org.greenrobot.eventbus.EventBus;
@@ -26,6 +33,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import threeblindmice.setitup.R;
+import threeblindmice.setitup.events.QueryEvent;
 import threeblindmice.setitup.events.UpdateFragmentEvent;
 
 
@@ -50,6 +58,8 @@ public class ContactsActivity extends AppCompatActivity {
 
     // Identifier for the permission request
     private static final int READ_CONTACTS_PERMISSIONS_REQUEST = 1;
+
+
 
     //  Persistent Objects
     private DrawerLayout drawerLayout;
@@ -127,17 +137,71 @@ public class ContactsActivity extends AppCompatActivity {
             trans.commit();
 
         }
+    }
 
 
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem search = menu.findItem(R.id.search);
+
+        //  Setup searchable icon and style
+        SearchView searchView = (SearchView) search.getActionView();
+
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchableInfo searchableInfo = searchManager.getSearchableInfo(getComponentName());
+
+        searchView.setSearchableInfo(searchableInfo);
+        searchView.setIconifiedByDefault(true);
+        searchView.setQueryHint(getString(R.string.search_hint));
+
+
+
+        EditText searchEditText = (EditText)searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+        ImageView searchCloseButton = (ImageView)searchView.findViewById(android.support.v7.appcompat.R.id.search_close_btn);
+        ImageView searchInner = (ImageView)searchView.findViewById(android.support.v7.appcompat.R.id.search_mag_icon);
+
+        SearchView.SearchAutoComplete theTextArea = (SearchView.SearchAutoComplete)searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+        theTextArea.setTextColor(ResourcesCompat.getColor(getResources(), R.color.primary_light, null));
+        searchEditText.setTextColor(ResourcesCompat.getColor(getResources(), R.color.primary_light, null));
+        searchEditText.setHintTextColor(ResourcesCompat.getColor(getResources(), R.color.primary_light, null));
+        searchCloseButton.setImageResource(R.drawable.close_icon);
+        searchInner.setImageResource(R.drawable.search_icon);
+
+        ImageView searchMagIcon = (ImageView)searchView.findViewById(android.support.v7.appcompat.R.id.search_button);
+        searchMagIcon.setImageResource(R.drawable.search_icon);
+
+
+        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.options_menu, menu);
+        MenuItem search = menu.findItem(R.id.search);
+        SearchView searchView = (SearchView) search.getActionView();
+
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextChange(String query) {
+                EventBus.getDefault().post(new QueryEvent(query));
+                return true;
+
+            }
+
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                onQueryTextChange(query);
+                return true;
+            }
+        });
 
         return super.onCreateOptionsMenu(menu);
     }
+
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

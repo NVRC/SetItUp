@@ -1,14 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:bind="http://schemas.android.com/apk/res-auto">
     <data>
         <variable
             name="viewModel"
             type="threeblindmice.setitup.viewmodel.ContactViewModel"/>
     </data>
-    <Button
-        android:layout_height="50dp"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:text="@{viewModel.name}"
-        />
+        android:layout_margin="8dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/standard_margin"
+            android:textSize="12sp"
+            android:layout_marginTop="2dp"
+            bind:imageBitmap="@{viewModel.photo}"
+            android:textAllCaps="false"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/standard_margin"
+            android:textSize="12sp"
+            android:layout_marginTop="2dp"
+            android:text="@{viewModel.name}"
+            android:textAllCaps="false"
+            />
+
+    </LinearLayout>
+
+
+
+
+
 
 </layout>

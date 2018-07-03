@@ -148,7 +148,6 @@ public class NavDrawerFragment extends Fragment implements NavInterface {
                                 //
                             }
                         })
-
                 .show();
             }
         });
@@ -255,7 +254,7 @@ public class NavDrawerFragment extends Fragment implements NavInterface {
     private class onError implements Handler.Callback {
         @Override
         public boolean handleMessage(Message message){
-            System.out.println(Message.obtain());
+
             return true;
         }
     }
