@@ -32,68 +32,52 @@ public class LocalContactThread extends Thread {
 
     public LocalContactThread(Context context){
         mContext = context;
-
-
-
     }
 
     @Override
     public void run(){
-
+        //  Fetch the initial collection of Contacts (t0)
         Set<Contact> baseSet = new HashSet<>(queryAllContacts());
         while(!this.isInterrupted()) {
             try {
-
-                //  Contacts added during the sleep period are handled
-
+                //  Wait some amount of time before fetching the new collection (t1)
                 Thread.sleep(UPDATE_PERIOD);
                 Set<Contact> newSet = new HashSet<>(queryAllContacts());
-                /*
-                Collection newContactsToAdd = CollectionUtils.disjunction(baseSet, newSet);
-                for (Iterator<Contact> itr = newContactsToAdd.iterator(); itr.hasNext();){
-                    Contact tempContact = itr.next();
-                    // TODO: Check if this just creates pointers to one contact
-                    EventBus.getDefault().post(new AddContactEvent(tempContact));
-                }
-                */
 
+                //  Create a temp collection to find  elements found in (t0) and !(t1)
                 Set<Contact> tempBase = new HashSet<>(baseSet);
                 baseSet.removeAll(newSet);
                 Set<Contact> contactsToRemove = baseSet;
+
+                //  Determine which elements are found in (t1) and !(t0)
                 newSet.removeAll(tempBase);
                 Set<Contact> contactsToAdd = newSet;
 
-                    //  Only preforming operations on new or updating Contacts saves RecyclerViewer
-                    //  transactions and supports add() and remove() animations
+                //  Only preforming operations on new or updating Contacts saves RecyclerViewer
+                //  transactions and supports add() and remove() animations
+                for (Iterator<Contact> i = contactsToAdd.iterator(); i.hasNext(); ) {
+                    Contact item = i.next();
+                    //  Notify ViewModel adapter to add a contact from the RecyclerView
+                    EventBus.getDefault().post(new AddContactEvent(item));
+                }
+                for (Iterator<Contact> i = contactsToRemove.iterator(); i.hasNext(); ) {
+                    Contact item = i.next();
+                    //  Notify ViewModel adapter to remove a contact from the RecyclerView
+                    EventBus.getDefault().post(new RemoveContactEvent(item));
+                }
 
-                    for (Iterator<Contact> i = contactsToAdd.iterator(); i.hasNext(); ) {
-                        Contact item = i.next();
-                        EventBus.getDefault().post(new AddContactEvent(item));
-
-                    }
-                    for (Iterator<Contact> i = contactsToRemove.iterator(); i.hasNext(); ) {
-                        Contact item = i.next();
-                        EventBus.getDefault().post(new RemoveContactEvent(item));
-
-                    }
-
-
-
-                //  Reset T1
+                //  Fetch new base set (t0)
                 baseSet = new HashSet<>(queryAllContacts());
             } catch (InterruptedException e) {
                 // Implement thread.interrupt() behavior here
                 return;
             }
         }
-
     }
 
     private List<Contact> queryAllContacts(){
         List<Contact> contacts = new ArrayList<>();
-
-
-
+        //
         ContentResolver cr = mContext.getContentResolver();
             Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI,
                     null,
@@ -103,8 +87,6 @@ public class LocalContactThread extends Thread {
                     int idLong = cur.getColumnIndex(ContactsContract.Contacts._ID);
                     String id = cur.getString(idLong);
                     String name = cur.getString(cur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-
-
                     Bitmap photo = null;
 
                     try {
@@ -140,10 +122,8 @@ public class LocalContactThread extends Thread {
                 }
             }
             if(init){
-
                 EventBus.getDefault().post(new AddContactEvent(contacts));
             }
-
         return contacts;
     }
 }

@@ -13,7 +13,6 @@ import threeblindmice.setitup.model.Contact;
 
 
 public class ContactViewModel extends BaseObservable {
-    //public ObservableMap<Integer, Integer> contactId = new ObservableArrayMap();
     private Contact mContact;
 
 
@@ -21,9 +20,6 @@ public class ContactViewModel extends BaseObservable {
     public ContactViewModel(){
 
     }
-
-
-
 
     public Contact getContact(){
         return mContact;

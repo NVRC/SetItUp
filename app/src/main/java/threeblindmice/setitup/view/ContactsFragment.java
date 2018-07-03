@@ -20,7 +20,6 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeSet;
 
 import threeblindmice.setitup.R;
 import threeblindmice.setitup.databinding.FragmentContactsBinding;
@@ -37,12 +36,10 @@ import threeblindmice.setitup.viewmodel.ContactViewModel;
  */
 
 public class ContactsFragment extends Fragment {
+
+    //  Class Vars
     private ContactsModel mContactsModel;
     private ContactAdapter mContactAdapter;
-    private List<Contact> currData;
-    private TreeSet<Contact> currSortedSet;
-    private SortedList<Contact> sortedList;
-    private boolean likelyUnsorted = false;
     private FragmentContactsBinding binding;
 
 
@@ -78,11 +75,22 @@ public class ContactsFragment extends Fragment {
     @Override
     public void onStart(){
         super.onStart();
-
     }
 
-    private List<Contact> filter(List<Contact> contacts, String query){
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
 
+    //  Prompt the Model to interrupt LocalContactThread
+    @Override
+    public void onPause(){
+        super.onPause();
+        mContactsModel.teardown();
+    }
+
+    //  Matches a text query to Contact.name using contains
+    private List<Contact> filter(List<Contact> contacts, String query){
         List<Contact> filteredModelList = new ArrayList<>();
         for (Contact contact : contacts) {
             String text = contact.getName().toLowerCase();
@@ -91,10 +99,35 @@ public class ContactsFragment extends Fragment {
             }
         }
         return filteredModelList;
-
     }
 
-    @Subscribe
+
+
+    /*  Asynchronous Event Listeners
+    ------------------------------------------------------------------------------------------------
+    */
+
+    @Subscribe(threadMode = ThreadMode.BACKGROUND)
+    public void onUpdate(RefreshContactListEvent event){
+        State tempState = event.getState();
+        if(tempState == State.INIT){
+            mContactAdapter.clear();
+            mContactAdapter.addAll(event.getContacts());
+        } else if (tempState == State.SINGLE){
+            int pos;
+            Contact contact = event.getContact();
+            //  All animations, sorting, etc. handled by SortedListAdapter for RecyclerView
+            if(event.getFlag()){
+                //  Add condition
+                mContactAdapter.addItem(contact);
+            } else if (!event.getFlag()) {
+                //  Remove condition
+                mContactAdapter.removeItem(contact);
+            }
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void handleQueryEvent(QueryEvent event){
         // Here is where we are going to implement the filter logic
         List<Contact> filteredModelList = filter(mContactAdapter.getDataList(), event.getQuery());
@@ -108,69 +141,12 @@ public class ContactsFragment extends Fragment {
 
 
 
+    /*  Private Classes
+    ------------------------------------------------------------------------------------------------
 
-    //  Save states
-    @Override
-    public void onPause(){
-        super.onPause();
-        mContactsModel.teardown();
-    }
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
-
-
-
-    @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    public void onUpdate(RefreshContactListEvent event){
-        State tempState = event.getState();
-
-        if(tempState == State.INIT){
-            mContactAdapter.clear();
-            mContactAdapter.addAll(event.getContacts());
-        } else if (tempState == State.SINGLE){
-            int pos;
-            Contact contact = event.getContact();
-            if(event.getFlag()){
-                //  Add condition
-                mContactAdapter.addItem(contact);
-                //  mContactsAdapter.getCallback.batchedCallback.dispatchLastEvent();
-
-
-                /*
-                if(currSortedSet.add(contact)){
-                    currData = new ArrayList<Contact>(currSortedSet);
-                    pos = currData.indexOf(contact);
-                    mContactAdapter.notifyItemInserted(pos);
-                }
-                */
-
-            } else if (!event.getFlag()) {
-                //  Remove condition
-
-                mContactAdapter.removeItem(contact);
-                //batchedCallback.dispatchLastEvent();
-
-                /*
-                pos = currData.indexOf(contact);
-                if(pos >- 1){
-                    if(currSortedSet.remove(contact)) {
-                        currData = new ArrayList<Contact>(currSortedSet);
-                        mContactAdapter.notifyItemRemoved(pos);
-                        mContactAdapter.notifyItemRangeChanged(pos, currData.size());
-                    }
-                }
-                */
-
-            }
-        }
-    }
-
-
-    // Private classes within this scope to utilize getActivity()
-    // The data binding pattern, details in layout xmls, decouples design from development
-    // TODO: Style xml
+        Private classes within this scope to utilize getActivity()
+        The data binding pattern, details in layout xmls, decouples design from development
+    */
     private class ContactHolder extends RecyclerView.ViewHolder {
         private ItemContactBinding mBinding;
 
@@ -190,11 +166,20 @@ public class ContactsFragment extends Fragment {
     private class ContactAdapter extends RecyclerView.Adapter<ContactHolder> implements SectionTitleProvider{
         private SortedList<Contact> mData;
         private ArrayList<Contact> duplicateData;
-        private SortedList.BatchedCallback<Contact> batchedCallback;
 
         public ContactAdapter(){
+            //  A List type structure duplicates the SortedList bound to the RecyclerView
 
+            //  This is done as SortedList is not a collection and cannot be mapped to a List
+            //  or another data structure compatible with the fast scroll implementation.
+            //  I suspect the memory allocation cost isn't too steep but further analysis will be
+            //  performed once the overall logic and UI components are in place. From then on,
+            //  the work will be optimization.
             duplicateData = new ArrayList<>();
+
+            //  The SortedList data structure takes a Class prototype of the Sorted Element and
+            //  a SortedListAdaptedCallback which binds mData to RecyclerView.Adapter who controls
+            //  the positioning of elements.
             mData = new SortedList<>(Contact.class, new SortedListAdapterCallback<Contact>(this){
                 @Override
                 public boolean areContentsTheSame(Contact a1, Contact a2) {
@@ -210,7 +195,6 @@ public class ContactsFragment extends Fragment {
                     }
                     return false;
                 }
-
                 @Override
                 public void onInserted(int position, int count){
                     notifyItemChanged(position);
@@ -220,8 +204,6 @@ public class ContactsFragment extends Fragment {
                 public int compare(Contact item1, Contact item2) {
                     return item1.getName().compareToIgnoreCase(item2.getName());
                 }
-
-
                 @Override
                 public void onRemoved(int position, int count) {
                     notifyItemRangeRemoved(position, count);
@@ -232,29 +214,19 @@ public class ContactsFragment extends Fragment {
                     notifyItemMoved(fromPosition, toPosition);
                 }
             });
-
-
-
         }
+
+        //  Helper Functions
 
         public List<Contact> getDataList(){
             return duplicateData;
         }
 
-        @Override
-        public String getSectionTitle(int position) {
-            //this String will be shown in a bubble for specified position
-            return mData.get(position).getName().substring(0, 1);
-        }
-
-
-        //  Helpers
         public void addAll(List<Contact> contacts) {
             mData.addAll(contacts);
             duplicateData.addAll(contacts);
 
         }
-
 
         public void clear() {
             mData.beginBatchedUpdates();
@@ -263,6 +235,22 @@ public class ContactsFragment extends Fragment {
                 mData.removeItemAt(mData.size() - 1);
             }
             mData.endBatchedUpdates();
+        }
+
+        public void addItem(Contact c){
+            mData.add(c);
+            duplicateData.add(c);
+        }
+        public void removeItem(Contact c){
+            mData.remove(c);
+            duplicateData.remove(c);
+        }
+
+        //  Required for SectionTitleProvider implementation of fast scrolling
+        @Override
+        public String getSectionTitle(int position) {
+            //  Sets the display letter of the fast scroll bubble
+            return mData.get(position).getName().substring(0, 1);
         }
 
         @Override
@@ -280,19 +268,8 @@ public class ContactsFragment extends Fragment {
         }
 
         @Override public int getItemCount(){
-            if(mData == null){return 0;}
+            if (mData == null){ return 0;}
             return mData.size();
-        }
-
-        public void addItem(Contact c){
-            mData.add(c);
-            duplicateData.add(c);
-            //batchedCallback.dispatchLastEvent();
-        }
-        public void removeItem(Contact c){
-            mData.remove(c);
-            duplicateData.remove(c);
-            //batchedCallback.dispatchLastEvent();
         }
     }
 }

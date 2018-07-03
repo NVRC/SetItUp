@@ -213,9 +213,7 @@ public class ContactsActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-
-
-
+    //  Updates the fragment container
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onFragmentUpdate(UpdateFragmentEvent event){
         if(drawerLayout != null) {
@@ -224,7 +222,6 @@ public class ContactsActivity extends AppCompatActivity {
         String tag = event.getTag();
         FragmentManager fragmentManager = getSupportFragmentManager();
         if (tag.equals(TAG_CONTACTS_FRAGMENT)){
-
             Fragment frag = fragmentManager.findFragmentByTag(TAG_EMPTY_FRAGMENT);
             if(frag != null && frag.isVisible()){
                 FragmentTransaction trans = getSupportFragmentManager().beginTransaction();
