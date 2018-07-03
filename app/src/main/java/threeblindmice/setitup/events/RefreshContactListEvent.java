@@ -18,18 +18,12 @@ public class RefreshContactListEvent {
             contact = obj;
             addFlag = flag;
             this.state = State.SINGLE;
-
-
         }
     }
 
     public RefreshContactListEvent(List<Contact> contactList, State newState){
-
-
             this.contacts = contactList;
             this.state = newState;
-
-
     }
 
     public Contact getContact(){

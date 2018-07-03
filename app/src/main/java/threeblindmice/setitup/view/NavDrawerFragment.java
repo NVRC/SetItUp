@@ -7,7 +7,6 @@ import android.accounts.AccountManagerFuture;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -37,18 +36,9 @@ import threeblindmice.setitup.listeners.OptionClickListener;
 
 public class NavDrawerFragment extends Fragment implements NavInterface {
 
-    public NavInterface callbacksInterface;
-
     //  Constants
-    //  Fragment IDs
-    private static final String TAG_EMPTY_FRAGMENT = "TAG_EMPTY_FRAGMENT";
-    private static final String TAG_CONTACT_FRAGMENT = "TAG_CONTACT_FRAGMENT";
     private static final String GOOGLE_ACC_TYPE = "com.google";
-    private static final int CONST_OPTIONS_ELEMENT_OFFSET = 4;
-
     private static final int AUTH_REQUEST = 0;
-
-
 
 
     public static NavDrawerFragment newInstance(){
@@ -63,40 +53,36 @@ public class NavDrawerFragment extends Fragment implements NavInterface {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                               Bundle savedInstanceState) {
-
         View view = inflater.inflate(R.layout.fragment_nav_drawer, container, false);
-
-
         return view;
     }
 
     @Override
     public void onStart(){
         super.onStart();
-
-        //  Set nav drawer header height
+        //  Programmatically set Header height according to Material design spec
         final LinearLayout layout = getView().findViewById(R.id.nav_header_container);
         ViewTreeObserver vto = layout.getViewTreeObserver();
+        //  Bind inflation, layout listener to the header so that the height set will be preserved
         vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-
                 ViewGroup.LayoutParams params = layout.getLayoutParams();
-                //  Sets the height to be width*9/16 as recommended in Material specs
+                //  Sets the height = width * 9/16
                 Double height = layout.getMeasuredWidth() * 0.5725;
                 params.height = height.intValue();
                 layout.setLayoutParams(params);
-
                 ViewTreeObserver obs = layout.getViewTreeObserver();
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                    obs.removeOnGlobalLayoutListener(this);
-                }
+
+                // Unbind the listener as it needs only occur once
+                obs.removeOnGlobalLayoutListener(this);
+
             }
         });
 
 
-        //  Starts the account selection process
-        //  Precursor to OAuth2
+        //  Unbind the start of the account selection process
+        // TODO: Update Account Manager UX flow when decided
         TextView email = (TextView) getView().findViewById(R.id.nav_header_email);
         email.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -144,10 +130,7 @@ public class NavDrawerFragment extends Fragment implements NavInterface {
 
         // Programmatically handles all options defined in XML
         LinearLayout ll = (LinearLayout) getView().findViewById(R.id.option_container);
-
         for( int i = 0; i < ll.getChildCount(); i++ ){
-            //  View instead of TextView to handle polymorphism
-            //  TODO: Update XML dependant View calls
             TextView tv = (TextView) ll.getChildAt(i);
             OptionClickListener ocl = new OptionClickListener();
             ocl.setId(tv.getText().toString());
@@ -156,33 +139,30 @@ public class NavDrawerFragment extends Fragment implements NavInterface {
         }
     }
 
+    //  Takes a name referenced by an Account in AccountManager
     private void startGoogleAuth(CharSequence targetName){
-
         AccountManager am = AccountManager.get(getActivity());
         Bundle options = new Bundle();
-        //  Currently just selects the first account for testing
+
+        //  TODO: check for other account types e.g. Facebook "com.facebook.auth.login"
         Account[] accounts = am.getAccountsByType(GOOGLE_ACC_TYPE);
         for (Account acc : accounts){
             if(acc.name.equals(targetName)){
+                //  Get Account object from AccountManager
                 //  TODO: Implement error handling
                 am.getAuthToken(
-                        acc,                     // Account retrieved using getAccountsByType()
-                        "Schedule To Meet Up",            // Auth scope
+                        acc,
+                        "Schedule To Meet Up",  // Auth scope
                         options,                        // Authenticator-specific options
-                        getActivity(),                           // Your activity
-                        new OnTokenAcquired(),          // Callback called when a token is successfully acquired
-                        new Handler(new onError()));    // Callback called if an error occurs
+                        getActivity(),
+                        new OnTokenAcquired(),          // Callback on token success
+                        new Handler(new onError()));    // Callback if an error occurred
             }
         }
-
-
-
-
-
-
     }
 
     //  Manage fragment transactions with IDs
+    //  Notify the main activity to swap fragments
     @Override
     public void onOptionSelected(String id){
         EventBus.getDefault().post(new UpdateFragmentEvent(id));
@@ -193,7 +173,6 @@ public class NavDrawerFragment extends Fragment implements NavInterface {
     private class onError implements Handler.Callback {
         @Override
         public boolean handleMessage(Message message){
-
             return true;
         }
     }

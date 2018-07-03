@@ -11,6 +11,8 @@ public final class ImageBinder {
     private ImageBinder() {
     }
 
+
+
     @BindingAdapter("bind:imageBitmap")
     public static void loadImage(ImageView iv, Bitmap bitmap) {
         if (bitmap == null){

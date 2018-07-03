@@ -16,7 +16,6 @@ import threeblindmice.setitup.model.Contact;
 
 
 public class ContactViewModel extends BaseObservable {
-    //public ObservableMap<Integer, Integer> contactId = new ObservableArrayMap();
     private Contact mContact;
     private Context mContext;
 
@@ -25,8 +24,6 @@ public class ContactViewModel extends BaseObservable {
     public ContactViewModel(Context context){
         this.mContext = context;
     }
-
-
 
     @Bindable
     public Drawable getDrawable() {

@@ -8,8 +8,6 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -31,23 +29,18 @@ public class ContactsModel {
     private ArrayList<Contact> contactList;
     private Context mContext;
     private State state = State.INIT;
-    private static int CONTACT_DEBOUNCE = 3;
-    private int debounce;
-
-    LocalContactThread lct;
+    private LocalContactThread lct;
 
 
     public ContactsModel(Context context) {
+        //  Init Vars
         this.mContext = context;
+        this.synchronizedContacts = new ConcurrentHashMap<String, Contact>();
 
-        synchronizedContacts = new ConcurrentHashMap<String, Contact>();
         EventBus.getDefault().register(this);
-        //  Pass an empty list to disable testing
-        List<Contact> testLoad = Collections.emptyList();
+
         this.lct = new LocalContactThread(mContext);
-
         this.lct.start();
-
     }
 
     public void teardown() {
@@ -55,77 +48,82 @@ public class ContactsModel {
     }
 
 
-    public List<Contact> getAlphaSortedList() {
-        List<Contact> temp;
-        //  TODO: Purge
-        if (contactList != null) {
-            temp = new ArrayList<Contact>(contactList);
-            Collections.sort(temp, new Comparator<Contact>() {
-                @Override
-                public int compare(Contact c1, Contact c2) {
-                    return c1.compareTo(c2.getName());
-
-                }
-            });
-        } else {
-            temp = new ArrayList<>();
-        }
-        return temp;
-    }
-
-
-    @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    public void updateContact(AddContactEvent newEvent) {
-        boolean listFlag = newEvent.getListFlag();
-        if (state == threeblindmice.setitup.util.State.INIT && listFlag) {
-            //  TODO: Remove test Contacts
-            char[] alpha = "abcdefghijklmnopqrstuvwxyz".toCharArray();
-            List<Contact> load = new ArrayList<>();
-            for(int i = 0; i < alpha.length; i++ ){
-                load.add(new Contact(Character.toString(alpha[i])));
-            }
-
-            load.addAll(newEvent.getContacts());
-            EventBus.getDefault().post(new RefreshContactListEvent(load,
-                    threeblindmice.setitup.util.State.INIT));
-            state = threeblindmice.setitup.util.State.SINGLE;
-        } else if(state ==threeblindmice.setitup.util.State.SINGLE && !listFlag){
-            Contact c = newEvent.getContact();
-            String cHash = c.getHash();
-            // Key is a hashed digest of the contact to avoid collisions
-            Object putResult = synchronizedContacts.put(cHash, c);
-            if (putResult instanceof Contact) {
-                //  Merge both phone number Sets
-                c.addPhoneNumberSet(((Contact) putResult).getNumbers());
-                synchronizedContacts.put(cHash, c);
-            } else if (putResult == null) {
-                //  New Contact Added
-                publishContactToView(c, true);
-            }
-        }
-
-    }
-
-
-
-
-
-    @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    public void removeContact(RemoveContactEvent newEvent){
-
-        Contact c = newEvent.getContact();
-        String cHash = c.getHash();
-        synchronizedContacts.remove(cHash);
-        publishContactToView(c,false);
-    }
-
+    //  Generic HashMap wrapper to return a List usable for a `RecyclerView` or other android res
     public List<Contact> getContacts(){
         Collection<Contact> values = synchronizedContacts.values();
         contactList = new ArrayList<>(values);
         return contactList;
     }
 
+    //
     private void publishContactToView(Contact c, boolean addFlag){
-        EventBus.getDefault().post(new RefreshContactListEvent( c, addFlag));
+
+    }
+
+    /*  Asynchronous Event Listeners
+    ------------------------------------------------------------------------------------------------
+
+        Event published by `LocalContactThread`
+
+        Two cases:
+
+            1)  INIT
+                    The App has just been launched and all contacts need to be added to this Model
+                    bound to the ViewModel, to the View and thus displayed.
+
+            2)  SINGLE
+                    A new contact has been found in `ContactsContract.Contacts` and is added to
+                        Model -> ViewModel -> View
+
+    */
+    @Subscribe(threadMode = ThreadMode.BACKGROUND)
+    public void updateContact(AddContactEvent newEvent) {
+        boolean listFlag = newEvent.getListFlag();
+        //  Assert
+        //      Model State vs enum INIT flag
+        //      listFlag: event contains a List
+        if (state == State.INIT && listFlag) {
+            //  Build a temporary test load of Contacts
+            //  TODO: Remove test Contacts on deployment
+            char[] alpha = "abcdefghijklmnopqrstuvwxyz".toCharArray();
+            List<Contact> load = new ArrayList<>();
+            for(int i = 0; i < alpha.length; i++ ){
+                load.add(new Contact(Character.toString(alpha[i])));
+            }
+            load.addAll(newEvent.getContacts());
+            EventBus.getDefault().post(new RefreshContactListEvent(load,
+                    State.INIT));
+            state = State.SINGLE;
+        }
+        //  Assert
+        //      Model State vs enum SINGLE flag
+        //  Adds the contact to a synchronized hash set where contacts are unique, and identified
+        //  by a hashed contact information digest
+        else if(state == State.SINGLE && !listFlag){
+            Contact c = newEvent.getContact();
+            String cHash = c.getHash();
+            //  Key is a hashed digest of the contact to avoid collisions
+            //  putResult returns a Contact if that contact already exists
+            Object putResult = synchronizedContacts.put(cHash, c);
+            //  Update the existing contact's phone number set
+            if (putResult instanceof Contact) {
+                //  Merge both phone number Sets
+                c.addPhoneNumberSet(((Contact) putResult).getNumbers());
+                synchronizedContacts.put(cHash, c);
+            } else if (putResult == null) {
+                //  New Contact added
+                //  Post Contact to ViewModel Adapter
+                EventBus.getDefault().post(new RefreshContactListEvent( c, true));
+            }
+        }
+
+    }
+
+    @Subscribe(threadMode = ThreadMode.BACKGROUND)
+    public void removeContact(RemoveContactEvent newEvent){
+        Contact c = newEvent.getContact();
+        String cHash = c.getHash();
+        synchronizedContacts.remove(cHash);
+        EventBus.getDefault().post(new RefreshContactListEvent( c, false));
     }
 }
