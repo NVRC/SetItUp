@@ -1,11 +1,8 @@
 package threeblindmice.setitup.viewmodel;
 
-import android.content.Context;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 
 import threeblindmice.setitup.model.Contact;
 
@@ -18,20 +15,15 @@ import threeblindmice.setitup.model.Contact;
 public class ContactViewModel extends BaseObservable {
     //public ObservableMap<Integer, Integer> contactId = new ObservableArrayMap();
     private Contact mContact;
-    private Context mContext;
 
 
 
-    public ContactViewModel(Context context){
-        this.mContext = context;
+    public ContactViewModel(){
+
     }
 
 
 
-    @Bindable
-    public Drawable getDrawable() {
-        return new BitmapDrawable(mContext.getResources(), mContact.getPhoto());
-    }
 
     public Contact getContact(){
         return mContact;
