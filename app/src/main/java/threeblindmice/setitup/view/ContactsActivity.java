@@ -179,16 +179,16 @@ public class ContactsActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.options_menu, menu);
+
+        //
         MenuItem search = menu.findItem(R.id.search);
         SearchView searchView = (SearchView) search.getActionView();
-
-
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            //  Notify RecyclerView.Adapter of query
             @Override
             public boolean onQueryTextChange(String query) {
                 EventBus.getDefault().post(new QueryEvent(query));
                 return true;
-
             }
 
             @Override
@@ -197,7 +197,6 @@ public class ContactsActivity extends AppCompatActivity {
                 return true;
             }
         });
-
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -211,9 +210,10 @@ public class ContactsActivity extends AppCompatActivity {
                 drawerLayout.openDrawer(GravityCompat.START);
                 return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
+
+
 
 
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
