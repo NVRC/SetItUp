@@ -50,6 +50,7 @@ public class NavDrawerFragment extends Fragment implements NavInterface {
 
     //  Dynamic vars
     private String currToken;
+    private UpdateTokenEvent tokenEvent;
 
     public static NavDrawerFragment newInstance(){
         return new NavDrawerFragment();
