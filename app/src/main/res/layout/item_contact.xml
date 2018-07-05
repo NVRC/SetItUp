@@ -8,28 +8,32 @@
     </data>
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_margin="8dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/contact_tile_height"
+        android:background="@color/primary_light"
+        android:layout_marginTop="2dp"
+        android:layout_marginLeft="2dp"
+        android:layout_marginRight="2dp"
         android:orientation="horizontal">
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="@dimen/standard_margin"
-            android:textSize="12sp"
-            android:layout_marginTop="2dp"
-            bind:imageBitmap="@{viewModel.photo}"
+            android:layout_marginTop="@dimen/contact_tile_img_padding"
+            android:layout_marginLeft="@dimen/contact_tile_img_padding"
+            android:layout_width="@dimen/contact_tile_img_size"
+            android:layout_height="@dimen/contact_tile_img_size"
+            android:padding="@dimen/contact_tile_padding"
             android:textAllCaps="false"
+            android:background="@color/primary_dark"
             />
+        <!--bind:imageBitmap="@{viewModel.photo}"-->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="@dimen/standard_margin"
-            android:textSize="12sp"
-            android:layout_marginTop="2dp"
+            android:padding="@dimen/contact_tile_img_text_padding"
+            android:layout_marginBottom="@dimen/contact_tile_img_padding"
+            android:layout_marginTop="@dimen/contact_tile_img_padding"
+            android:textSize="@dimen/contact_tile_name_text_size"
             android:text="@{viewModel.name}"
             android:textAllCaps="false"
+            android:textColor="@color/secondary_text"
             />
 
     </LinearLayout>
