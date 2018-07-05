@@ -142,14 +142,19 @@ public class NavDrawerFragment extends Fragment implements NavInterface {
 
 
         // Programmatically handles all options defined in XML
-        LinearLayout ll = (LinearLayout) getView().findViewById(R.id.option_container);
-        for( int i = 0; i < ll.getChildCount(); i++ ){
-            TextView tv = (TextView) ll.getChildAt(i);
-            OptionClickListener ocl = new OptionClickListener();
-            ocl.setId(tv.getText().toString());
-            ocl.setCallback(this);
-            tv.setOnClickListener(ocl);
-        }
+        //  TODO: Do less hacky
+        LinearLayout ll0 = (LinearLayout) getView().findViewById(R.id.nav_drawer_option_0);
+        LinearLayout ll1 = (LinearLayout) getView().findViewById(R.id.nav_drawer_option_1);
+        OptionClickListener ocl0 = new OptionClickListener();
+        OptionClickListener ocl1 = new OptionClickListener();
+        ocl0.setId(getString(R.string.contacts));
+        ocl1.setId(getString(R.string.empty));
+        ocl0.setCallback(this);
+        ocl1.setCallback(this);
+        ll0.setOnClickListener(ocl0);
+        ll1.setOnClickListener(ocl1);
+
+
     }
 
     //  Takes a name referenced by an Account in AccountManager

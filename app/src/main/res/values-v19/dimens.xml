@@ -9,17 +9,25 @@
     <dimen name="drawer_header_profile">64dp</dimen>
     <dimen name="drawer_header_height">200dp</dimen>
     <dimen name="activity_horizontal_margin">2dp</dimen>
-    <dimen name="nav_option_padding">8dp</dimen>
+
 
     <dimen name="nav_header_name">16dp</dimen>
     <dimen name="nav_header_email">12dp</dimen>
 
     <dimen name="nav_img_padding">20dp</dimen>
-    <dimen name="nav_img_padding_bottom">4dp</dimen>
-    <dimen name="nav_img_padding_left">32dp</dimen>
+    <dimen name="nav_img_padding_bottom">8dp</dimen>
+    <dimen name="nav_img_padding_left">24dp</dimen>
 
-    <dimen name="nav_email_padding">4dp</dimen>
-    <dimen name="nav_name_padding">4dp</dimen>
+    <dimen name="nav_email_padding">8dp</dimen>
+    <dimen name="nav_name_padding">8dp</dimen>
+
+    <dimen name="nav_option_contacts">48dp</dimen>
+    <dimen name="nav_option_margin">8dp</dimen>
+    <dimen name="nav_option_padding">12dp</dimen>
+    <dimen name="nav_option_text_size">16sp</dimen>
+    <dimen name="nav_option_img_size">24dp</dimen>
+    <dimen name="nav_option_img_left_padding">16dp</dimen>
+    <dimen name="nav_option_img_topbot_padding">12dp</dimen>
 
     <dimen name="contact_tile_height">72dp</dimen>
     <dimen name="contact_tile_img_size">58dp</dimen>
@@ -29,6 +37,7 @@
     <dimen name="contact_tile_img_padding">8dp</dimen>
     <dimen name="contact_tile_name_padding_top">24dp</dimen>
     <dimen name="contact_tile_name_text_size">16sp</dimen>
+
 
 
 

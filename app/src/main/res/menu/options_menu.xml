@@ -4,18 +4,13 @@
     xmlns:style="http://schemas.android.com/tools">
     <item
         android:id="@+id/search"
-
         android:enabled="true"
         android:visible="true"
+        android:title="@string/search_title"
         app:searchIcon="@drawable/search_icon"
         app:closeIcon="@drawable/close_icon"
         app:actionViewClass="android.support.v7.widget.SearchView"
-        app:showAsAction="always" />
-    <item
-        android:id="@+id/sort"
-        android:enabled="true"
-        android:icon="@drawable/sort_icon"
-        android:title="@string/sort_title"
-        android:visible="true"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always"
+        />
+
 </menu>
