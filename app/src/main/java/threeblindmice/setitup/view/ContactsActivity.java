@@ -45,8 +45,8 @@ public class ContactsActivity extends AppCompatActivity {
 
     //  Constants
     //  TODO: Setup auto-configuring fragment switching
-    private static final String TAG_EMPTY_FRAGMENT = "Empty";
-    private static final String TAG_CONTACTS_FRAGMENT = "Contacts";
+    private String TAG_EMPTY_FRAGMENT;
+    private String TAG_CONTACTS_FRAGMENT;
     private static final String TAG_NAV_FRAGMENT = "Nav";
     private static final int AUTH_REQUEST = 0;
 
@@ -74,6 +74,8 @@ public class ContactsActivity extends AppCompatActivity {
 
         EventBus.getDefault().register(this);
 
+        TAG_EMPTY_FRAGMENT = getString(R.string.empty);
+        TAG_CONTACTS_FRAGMENT = getString(R.string.contacts);
         //  INIT toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -214,7 +216,7 @@ public class ContactsActivity extends AppCompatActivity {
     }
 
     //  Updates the fragment container
-    @Subscribe(threadMode = ThreadMode.BACKGROUND)
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onFragmentUpdate(UpdateFragmentEvent event){
         if(drawerLayout != null) {
             drawerLayout.closeDrawers();

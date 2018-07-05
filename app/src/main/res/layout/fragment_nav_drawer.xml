@@ -18,10 +18,11 @@
             android:id="@+id/nav_header_img"
             android:layout_width="@dimen/drawer_header_profile"
             android:layout_height="@dimen/drawer_header_profile"
-            android:paddingBottom="@dimen/nav_img_padding_bottom"
-            android:paddingLeft="@dimen/nav_img_padding_left"
-            app:srcCompat="@drawable/account_icon"
+            android:layout_marginBottom="@dimen/nav_img_padding_bottom"
+            android:layout_marginLeft="@dimen/nav_img_padding_left"
+            android:background="@color/primary_light"
             />
+        <!--app:srcCompat="@drawable/account_icon"-->
 
         <TextView
             android:id="@+id/nav_header_name"
@@ -31,7 +32,6 @@
             android:textSize="@dimen/nav_header_name"
             android:gravity="bottom"
             android:layout_margin="@dimen/standard_margin"
-            android:paddingBottom="@dimen/nav_name_padding"
             android:paddingLeft="@dimen/nav_name_padding"
             android:textColor="@color/primary_light"
             android:textStyle="bold"
@@ -56,23 +56,59 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:paddingTop="@dimen/standard_margin"
+        android:layout_marginTop="@dimen/nav_option_padding"
+        android:layout_marginBottom="@dimen/nav_option_padding"
         android:id="@+id/option_container">
-        <TextView
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/nav_option_contacts"
+            android:orientation="horizontal"
             android:id="@+id/nav_drawer_option_0"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="@dimen/nav_option_padding"
-            android:layout_margin="@dimen/standard_margin"
-            android:text="@string/contacts" />
 
-        <TextView
-            android:id="@+id/nav_drawer_option_1"
+            >
+            <ImageView
+                android:layout_width="@dimen/nav_option_img_size"
+                android:layout_height="@dimen/nav_option_img_size"
+                android:layout_marginLeft="@dimen/nav_option_img_left_padding"
+                android:layout_marginTop="@dimen/nav_option_img_topbot_padding"
+                android:layout_marginBottom="@dimen/nav_option_img_topbot_padding"
+                android:background="@drawable/ic_baseline_account_box_24px"
+                />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="@dimen/nav_option_padding"
+                android:layout_marginRight="@dimen/nav_option_padding"
+                android:layout_marginLeft="@dimen/nav_option_padding"
+                android:textSize="@dimen/nav_option_text_size"
+                android:textColor="@color/primary_dark"
+                android:text="@string/contacts" />
+        </LinearLayout>
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="@dimen/nav_option_padding"
-            android:layout_margin="@dimen/standard_margin"
-            android:text="@string/empty" />
+            android:layout_height="@dimen/nav_option_contacts"
+            android:orientation="horizontal"
+            android:id="@+id/nav_drawer_option_1"
+
+            >
+            <ImageView
+                android:layout_width="@dimen/nav_option_img_size"
+                android:layout_height="@dimen/nav_option_img_size"
+                android:layout_marginLeft="@dimen/nav_option_img_left_padding"
+                android:layout_marginTop="@dimen/nav_option_img_topbot_padding"
+                android:layout_marginBottom="@dimen/nav_option_img_topbot_padding"
+                android:background="@drawable/ic_baseline_calendar_today_24px"
+                />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="@dimen/nav_option_padding"
+                android:layout_marginRight="@dimen/nav_option_padding"
+                android:layout_marginLeft="@dimen/nav_option_padding"
+                android:textSize="@dimen/nav_option_text_size"
+                android:textColor="@color/primary_dark"
+                android:text="@string/empty" />
+        </LinearLayout>
     </LinearLayout>
 
 
