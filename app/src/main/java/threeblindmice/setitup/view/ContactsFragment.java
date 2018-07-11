@@ -1,5 +1,6 @@
 package threeblindmice.setitup.view;
 
+import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -7,9 +8,12 @@ import android.support.v7.util.SortedList;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.util.SortedListAdapterCallback;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.futuremind.recyclerviewfastscroll.FastScroller;
 import com.futuremind.recyclerviewfastscroll.SectionTitleProvider;
@@ -19,6 +23,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import threeblindmice.setitup.R;
@@ -139,6 +144,23 @@ public class ContactsFragment extends Fragment {
     }
 
 
+    //  Test implementation to populate expandable recyclerviews
+    public List initCalendarArray(){
+        //  TODO: Handle date expression properly
+        Calendar calendar = Calendar.getInstance();
+        int dayOfMonth = calendar.get(Calendar.DAY_OF_WEEK_IN_MONTH);
+        int daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+        int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
+
+        List<Integer> dayArray = new ArrayList<Integer>();
+        for (int i = dayOfYear; i < calendar.getMaximum(Calendar.DAY_OF_YEAR); i++){
+            dayArray.add(i);
+        }
+        return dayArray;
+
+    }
+
+
 
 
     /*  Private Classes
@@ -147,19 +169,56 @@ public class ContactsFragment extends Fragment {
         Private classes within this scope to utilize getActivity()
         The data binding pattern, details in layout xmls, decouples design from development
     */
-    private class ContactHolder extends RecyclerView.ViewHolder {
+    private class ContactHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private ItemContactBinding mBinding;
+        private Context mContext;
+        private LinearLayout childrenLayout;
 
         private ContactHolder(ItemContactBinding binding){
             super(binding.getRoot());
             mBinding = binding;
-            mBinding.setViewModel(new ContactViewModel());
 
+            mContext = mBinding.getRoot().getContext();
+            childrenLayout = mBinding.getRoot().findViewById(R.id.contact_tile_child_container);
+            mBinding.getRoot().findViewById(R.id.contact_tile_container).setOnClickListener(this);
+            childrenLayout.setVisibility(View.GONE);
+
+            for (int i = (int) initCalendarArray().get(0); i < (int) initCalendarArray().get(0)+7; i++){
+                //  TODO: Style textviews
+                TextView tv = new TextView(mContext);
+                tv.setId(i);
+                tv.setPadding(0,20,0,20);
+                tv.setGravity(Gravity.CENTER);
+                tv.setText("Day "+Integer.toString(i));
+                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT);
+                childrenLayout.addView(tv, layoutParams);
+
+            }
+
+            mBinding.setViewModel(new ContactViewModel());
         }
 
         public void bind(Contact contact){
             mBinding.getViewModel().setContact(contact);
             mBinding.executePendingBindings();
+        }
+
+        @Override
+        public void onClick(View view) {
+            System.out.println("Clicking some dumb view: \t\tid "+ view.getId());
+            if (view.getId() == R.id.contact_tile_container) {
+                if (childrenLayout.getVisibility() == View.VISIBLE) {
+                    childrenLayout.setVisibility(View.GONE);
+                } else {
+                    childrenLayout.setVisibility(View.VISIBLE);
+                }
+            } else {
+
+                //  Handle clicking other item
+
+            }
         }
     }
 
