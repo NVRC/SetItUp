@@ -12,6 +12,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -23,7 +24,6 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 import threeblindmice.setitup.R;
@@ -33,6 +33,7 @@ import threeblindmice.setitup.events.QueryEvent;
 import threeblindmice.setitup.events.RefreshContactListEvent;
 import threeblindmice.setitup.model.Contact;
 import threeblindmice.setitup.model.ContactsModel;
+import threeblindmice.setitup.util.SalientCalendarContainer;
 import threeblindmice.setitup.util.State;
 import threeblindmice.setitup.viewmodel.ContactViewModel;
 
@@ -42,10 +43,13 @@ import threeblindmice.setitup.viewmodel.ContactViewModel;
 
 public class ContactsFragment extends Fragment {
 
+
     //  Class Vars
     private ContactsModel mContactsModel;
     private ContactAdapter mContactAdapter;
     private FragmentContactsBinding binding;
+
+
 
 
 
@@ -144,21 +148,6 @@ public class ContactsFragment extends Fragment {
     }
 
 
-    //  Test implementation to populate expandable recyclerviews
-    public List initCalendarArray(){
-        //  TODO: Handle date expression properly
-        Calendar calendar = Calendar.getInstance();
-        int dayOfMonth = calendar.get(Calendar.DAY_OF_WEEK_IN_MONTH);
-        int daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
-        int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
-
-        List<Integer> dayArray = new ArrayList<Integer>();
-        for (int i = dayOfYear; i < calendar.getMaximum(Calendar.DAY_OF_YEAR); i++){
-            dayArray.add(i);
-        }
-        return dayArray;
-
-    }
 
 
 
@@ -173,23 +162,87 @@ public class ContactsFragment extends Fragment {
         private ItemContactBinding mBinding;
         private Context mContext;
         private LinearLayout childrenLayout;
+        private SalientCalendarContainer sCC;
 
         private ContactHolder(ItemContactBinding binding){
             super(binding.getRoot());
             mBinding = binding;
+
+            sCC = new SalientCalendarContainer();
 
             mContext = mBinding.getRoot().getContext();
             childrenLayout = mBinding.getRoot().findViewById(R.id.contact_tile_child_container);
             mBinding.getRoot().findViewById(R.id.contact_tile_container).setOnClickListener(this);
             childrenLayout.setVisibility(View.GONE);
 
-            for (int i = (int) initCalendarArray().get(0); i < (int) initCalendarArray().get(0)+7; i++){
+            //  Init week selector header
+            LinearLayout navLinearLayout = new LinearLayout(mContext);
+            navLinearLayout.setOrientation(LinearLayout.HORIZONTAL);
+            LinearLayout.LayoutParams llParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT);
+
+            //  Init left and right week selectors
+            ImageView leftSelector = new ImageView(mContext);
+            int weekSelectorSize = getResources().getDimensionPixelSize(R.dimen.week_selectors);
+            leftSelector.setImageResource(R.drawable.ic_baseline_chevron_left_24px);
+            LinearLayout.LayoutParams leftSelParams = new LinearLayout.LayoutParams(
+                    weekSelectorSize,
+                    weekSelectorSize);
+            leftSelParams.gravity = Gravity.LEFT;
+            leftSelector.setLayoutParams(leftSelParams);
+
+            TextView tvLeft = new TextView(mContext);
+            tvLeft.setText(sCC.getLeftMonth() + " " + sCC.getLeftDay());
+            LinearLayout.LayoutParams leftTextParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT);
+            leftTextParams.gravity = Gravity.LEFT;
+            tvLeft.setLayoutParams(leftTextParams);
+
+            ImageView divider = new ImageView(mContext);
+            LinearLayout.LayoutParams dividerParams = new LinearLayout.LayoutParams(
+                    weekSelectorSize,
+                    weekSelectorSize);
+            dividerParams.gravity = Gravity.CENTER;
+            divider.setImageResource(R.drawable.ic_baseline_remove_24px);
+            divider.setLayoutParams(dividerParams);
+
+            TextView tvRight = new TextView(mContext);
+            tvRight.setText(sCC.getRightMonth() + " " + sCC.getRightDay());
+            LinearLayout.LayoutParams rightTextParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT);
+            rightTextParams.gravity = Gravity.RIGHT;
+            tvRight.setLayoutParams(rightTextParams);
+
+
+            ImageView rightSelector = new ImageView(mContext);
+            LinearLayout.LayoutParams rightSelParams = new LinearLayout.LayoutParams(
+                    weekSelectorSize,
+                    weekSelectorSize);
+            rightSelParams.gravity = Gravity.RIGHT;
+            rightSelector.setImageResource(R.drawable.ic_baseline_chevron_right_24px);
+            rightSelector.setLayoutParams(rightSelParams);
+
+            navLinearLayout.addView(leftSelector);
+            navLinearLayout.addView(tvLeft);
+            navLinearLayout.addView(divider);
+            navLinearLayout.addView(tvRight);
+            navLinearLayout.addView(rightSelector);
+
+
+
+            childrenLayout.addView(navLinearLayout, llParams);
+
+
+
+            for (String day : sCC.getDayArray()){
                 //  TODO: Style textviews
                 TextView tv = new TextView(mContext);
-                tv.setId(i);
                 tv.setPadding(0,20,0,20);
                 tv.setGravity(Gravity.CENTER);
-                tv.setText("Day "+Integer.toString(i));
+                tv.setText(day);
                 LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT);

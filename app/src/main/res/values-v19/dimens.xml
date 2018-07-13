@@ -38,6 +38,7 @@
     <dimen name="contact_tile_name_padding_top">24dp</dimen>
     <dimen name="contact_tile_name_text_size">16sp</dimen>
 
+    <dimen name="week_selectors">24dp</dimen>
 
 
 
