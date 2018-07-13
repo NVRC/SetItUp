@@ -59,7 +59,8 @@ public class SalientCalendarContainer {
             if(j > NUM_WEEKDAYS){
                 j = 1;
             }
-            dayArray[i] = dayMap.get(j);
+            //  Display (Today) on the first Day
+            dayArray[i] = ( i == 0 ) ? dayMap.get(j) + " (Today)" : dayMap.get(j) ;
             i++;
         }
     }

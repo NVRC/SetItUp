@@ -4,6 +4,7 @@ import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.util.SortedList;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -175,21 +176,32 @@ public class ContactsFragment extends Fragment {
             mBinding.getRoot().findViewById(R.id.contact_tile_container).setOnClickListener(this);
             childrenLayout.setVisibility(View.GONE);
 
+
+            //  Dimens
+            int weekSelectorSize = getResources().getDimensionPixelSize(R.dimen.week_selectors);
+            int margin = getResources().getDimensionPixelSize(R.dimen.week_selector_margin);
+            int marginSides = margin + getResources().getDimensionPixelSize(R.dimen.contact_tile_img_padding);
+            int tileHeight = getResources().getDimensionPixelSize(R.dimen.week_selector_height);
             //  Init week selector header
             LinearLayout navLinearLayout = new LinearLayout(mContext);
             navLinearLayout.setOrientation(LinearLayout.HORIZONTAL);
             LinearLayout.LayoutParams llParams = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.MATCH_PARENT);
+                    tileHeight);
+            navLinearLayout.setGravity(Gravity.CENTER_HORIZONTAL);
+            llParams.setMargins(marginSides,margin,marginSides,margin);
+            navLinearLayout.setBackgroundColor(ResourcesCompat.getColor(getResources(), R.color.primary_light, null));
+
+
 
             //  Init left and right week selectors
             ImageView leftSelector = new ImageView(mContext);
-            int weekSelectorSize = getResources().getDimensionPixelSize(R.dimen.week_selectors);
             leftSelector.setImageResource(R.drawable.ic_baseline_chevron_left_24px);
             LinearLayout.LayoutParams leftSelParams = new LinearLayout.LayoutParams(
                     weekSelectorSize,
                     weekSelectorSize);
-            leftSelParams.gravity = Gravity.LEFT;
+            leftSelParams.gravity = Gravity.START;
+            leftSelParams.setMargins(margin,margin,margin,0);
             leftSelector.setLayoutParams(leftSelParams);
 
             TextView tvLeft = new TextView(mContext);
@@ -230,22 +242,26 @@ public class ContactsFragment extends Fragment {
             navLinearLayout.addView(divider);
             navLinearLayout.addView(tvRight);
             navLinearLayout.addView(rightSelector);
-
-
-
             childrenLayout.addView(navLinearLayout, llParams);
-
 
 
             for (String day : sCC.getDayArray()){
                 //  TODO: Style textviews
                 TextView tv = new TextView(mContext);
-                tv.setPadding(0,20,0,20);
-                tv.setGravity(Gravity.CENTER);
+
+                int padding = getResources().getDimensionPixelSize(R.dimen.week_selector_padding);
+                tv.setPadding(padding,padding,padding,padding);
+
+
                 tv.setText(day);
                 LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT);
+                        tileHeight);
+
+                layoutParams.setMargins(marginSides,0,marginSides,margin);
+                tv.setGravity(Gravity.CENTER_HORIZONTAL);
+                tv.setBackgroundColor(ResourcesCompat.getColor(getResources(), R.color.primary_light, null));
+
                 childrenLayout.addView(tv, layoutParams);
 
             }
