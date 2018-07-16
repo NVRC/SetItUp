@@ -54,9 +54,9 @@ public class SalientCalendarContainer {
 
         //  TODO: Populate sCC with additional weeks
         int i = 0;
-        int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+        int dayOfWeek = dayOfMonth%7;
         if (directionInTime == FUTURE){
-
+            System.out.println("\t\tFuture\t\t Day Of Week: "+dayOfWeek + "\t\t Day of Month: "+dayOfMonth);
             for (int j = dayOfWeek; j < dayOfWeek + NUM_WEEKDAYS; j++) {
                 if (i >= NUM_WEEKDAYS){
                     break;
@@ -67,6 +67,9 @@ public class SalientCalendarContainer {
                 //  Display (Today) on the first Day
                 dayArray[i] = ( i == 0 ) ? "Today "+"("+ dayMap.get(j) +")" : dayMap.get(j) ;
                 i++;
+            }
+            for (String day : dayArray){
+                System.out.println(day);
             }
         } else if (directionInTime == PAST){
             int temp = calendar.get(Calendar.DAY_OF_WEEK);
@@ -87,32 +90,31 @@ public class SalientCalendarContainer {
     public void incrementWeek(){
         Map<Integer, String> dayMap = generateDayMap();
         Map<Integer, String> monthMap = generateMonthMap();
-        dayArray = new String[dayArray.length];
         int currMonth = (int) getKeyFromValue(monthMap, getRightMonth());
+        System.out.println("\t\tRight Day: "+getRightDay());
         buildVariables(currMonth,
-                getRightDay(),
-                calendar.get(currMonth-1), FUTURE);
+                rightDay,
+                calendar.get(currMonth), FUTURE);
     }
 
     public void decrementWeek(){
         Map<Integer, String> dayMap = generateDayMap();
         Map<Integer, String> monthMap = generateMonthMap();
-        dayArray = new String[dayArray.length];
         int currMonth = (int) getKeyFromValue(monthMap, getLeftMonth());
         buildVariables(currMonth,
                 getLeftDay(),
-                calendar.get(currMonth-1), PAST);
+                calendar.get(currMonth), PAST);
 
     }
 
     public void setLeftMonthDay(String month, int day){
-        this.leftMonth = month;
-        this.leftDay = day;
+        leftMonth = month;
+        leftDay = day;
     }
 
     public void setRightMonthDay(String month, int day){
-        this.rightMonth = month;
-        this.rightDay = day;
+        rightMonth = month;
+        rightDay = day;
     }
 
     public String getLeftMonth(){
@@ -135,7 +137,6 @@ public class SalientCalendarContainer {
     }
 
     //  Helper Functions
-
     private Object getKeyFromValue(Map hm, Object value) {
         for (Object o : hm.keySet()) {
             if (hm.get(o).equals(value)) {

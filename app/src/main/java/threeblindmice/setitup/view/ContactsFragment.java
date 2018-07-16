@@ -32,6 +32,7 @@ import threeblindmice.setitup.databinding.FragmentContactsBinding;
 import threeblindmice.setitup.databinding.ItemContactBinding;
 import threeblindmice.setitup.events.QueryEvent;
 import threeblindmice.setitup.events.RefreshContactListEvent;
+import threeblindmice.setitup.events.UpdateUIComponentEvent;
 import threeblindmice.setitup.listeners.DayOnClickListener;
 import threeblindmice.setitup.model.Contact;
 import threeblindmice.setitup.model.ContactsModel;
@@ -63,6 +64,8 @@ public class ContactsFragment extends Fragment {
             308,
             309
     };
+    private static final int LEFT_MONTH_TV_ID = 3;
+    private static final int RIGHT_MONTH_TV_ID = 4;
 
 
 
@@ -221,6 +224,7 @@ public class ContactsFragment extends Fragment {
             TextView tvLeft = new TextView(mContext);
             String leftString = sCC.getLeftMonth() + " " + sCC.getLeftDay();
             tvLeft.setText(leftString);
+            tvLeft.setId(LEFT_MONTH_TV_ID);
             LinearLayout.LayoutParams leftTextParams = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -238,6 +242,7 @@ public class ContactsFragment extends Fragment {
             TextView tvRight = new TextView(mContext);
             String rightString = sCC.getRightMonth() + " " + sCC.getRightDay();
             tvRight.setText(rightString);
+            tvRight.setId(RIGHT_MONTH_TV_ID);
             LinearLayout.LayoutParams rightTextParams = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -295,14 +300,32 @@ public class ContactsFragment extends Fragment {
 
         private void updateUI(){
             String[] temp = sCC.getDayArray();
+            TextView tv = null;
             for (int i = 0; i < SalientCalendarContainer.NUM_WEEKDAYS; i++){
-                TextView tv = getActivity().findViewById(WEEK_IDS[0]);
+                try {
+                    tv = getActivity().findViewById(WEEK_IDS[i]);
+                } catch (NullPointerException e){
+                    e.printStackTrace();
+                }
                 if (tv != null){
-                    System.out.println("VIEW NULL");
-
-                    tv.setText(temp[i]);
+                    System.out.println("Setting Text: "+temp[i]);
+                    EventBus.getDefault().post(new UpdateUIComponentEvent(WEEK_IDS[i],temp[i]));
                 }
             }
+            TextView tvL = null;
+            tvL = getActivity().findViewById(LEFT_MONTH_TV_ID);
+            if ( tvL != null){
+                EventBus.getDefault().post(new UpdateUIComponentEvent(LEFT_MONTH_TV_ID,
+                        sCC.getLeftMonth() + " " + sCC.getLeftDay()));
+            }
+            TextView tvR = null;
+            tvR = getActivity().findViewById(RIGHT_MONTH_TV_ID);
+            if ( tvR != null){
+                EventBus.getDefault().post(new UpdateUIComponentEvent(RIGHT_MONTH_TV_ID,
+                        sCC.getRightMonth() + " " + sCC.getRightDay()));
+            }
+
+
 
         }
 
@@ -379,6 +402,7 @@ public class ContactsFragment extends Fragment {
                     notifyItemMoved(fromPosition, toPosition);
                 }
             });
+
         }
 
         //  Helper Functions
@@ -392,6 +416,7 @@ public class ContactsFragment extends Fragment {
             duplicateData.addAll(contacts);
 
         }
+
 
         public void clear() {
             mData.beginBatchedUpdates();
