@@ -7,8 +7,10 @@ import java.util.Map;
 
 public class SalientCalendarContainer {
     //  Constants
-    private final static int NUM_WEEKS_CACHED = 10;
-    private final static int NUM_WEEKDAYS = 7;
+    public final static int NUM_WEEKS_CACHED = 10;
+    public final static int NUM_WEEKDAYS = 7;
+    public final static boolean FUTURE = false;
+    public final static boolean PAST = true;
 
     private String leftMonth;
     private String rightMonth;
@@ -32,11 +34,11 @@ public class SalientCalendarContainer {
         int daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
         int currMonth = calendar.get(Calendar.MONTH);
 
-        buildVariables(currMonth,dayOfMonth,daysInMonth);
+        buildVariables(currMonth,dayOfMonth,daysInMonth, FUTURE);
 
     }
 
-    private void buildVariables(int currMonth, int dayOfMonth, int daysInMonth){
+    private void buildVariables(int currMonth, int dayOfMonth, int daysInMonth, boolean directionInTime){
         Map<Integer, String> dayMap = generateDayMap();
         Map<Integer, String> monthMap = generateMonthMap();
 
@@ -49,19 +51,36 @@ public class SalientCalendarContainer {
         } else {
             setRightMonthDay(monthString, firstDayNextWeek);
         }
-        int temp = calendar.get(Calendar.DAY_OF_WEEK);
+
         //  TODO: Populate sCC with additional weeks
         int i = 0;
-        for (int j = temp; j < temp + NUM_WEEKDAYS; j++) {
-            if (i >= NUM_WEEKDAYS){
-                break;
+        int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+        if (directionInTime == FUTURE){
+
+            for (int j = dayOfWeek; j < dayOfWeek + NUM_WEEKDAYS; j++) {
+                if (i >= NUM_WEEKDAYS){
+                    break;
+                }
+                if(j > NUM_WEEKDAYS){
+                    j = 1;
+                }
+                //  Display (Today) on the first Day
+                dayArray[i] = ( i == 0 ) ? "Today "+"("+ dayMap.get(j) +")" : dayMap.get(j) ;
+                i++;
             }
-            if(j > NUM_WEEKDAYS){
-                j = 1;
+        } else if (directionInTime == PAST){
+            int temp = calendar.get(Calendar.DAY_OF_WEEK);
+            for (int j = temp; j < 8; j--) {
+                if (i >= NUM_WEEKDAYS){
+                    break;
+                }
+                if(j == 1){
+                    j = 7;
+                }
+                //  Display (Today) on the first Day
+                dayArray[i] = ( i == 0 ) ? "Today "+"("+ dayMap.get(j) +")" : dayMap.get(j) ;
+                i++;
             }
-            //  Display (Today) on the first Day
-            dayArray[i] = ( i == 0 ) ? dayMap.get(j) + " (Today)" : dayMap.get(j) ;
-            i++;
         }
     }
 
@@ -71,8 +90,19 @@ public class SalientCalendarContainer {
         dayArray = new String[dayArray.length];
         int currMonth = (int) getKeyFromValue(monthMap, getRightMonth());
         buildVariables(currMonth,
-                getRightDay()+NUM_WEEKDAYS,
-                calendar.get(currMonth-1));
+                getRightDay(),
+                calendar.get(currMonth-1), FUTURE);
+    }
+
+    public void decrementWeek(){
+        Map<Integer, String> dayMap = generateDayMap();
+        Map<Integer, String> monthMap = generateMonthMap();
+        dayArray = new String[dayArray.length];
+        int currMonth = (int) getKeyFromValue(monthMap, getLeftMonth());
+        buildVariables(currMonth,
+                getLeftDay(),
+                calendar.get(currMonth-1), PAST);
+
     }
 
     public void setLeftMonthDay(String month, int day){
@@ -106,7 +136,7 @@ public class SalientCalendarContainer {
 
     //  Helper Functions
 
-    public Object getKeyFromValue(Map hm, Object value) {
+    private Object getKeyFromValue(Map hm, Object value) {
         for (Object o : hm.keySet()) {
             if (hm.get(o).equals(value)) {
                 return o;
@@ -120,7 +150,6 @@ public class SalientCalendarContainer {
         //  TODO: Optimize by using SparseIntArray to avoid auto-boxing int to Integer
         Map<Integer, String> dayMap = new HashMap<>();
         DateFormatSymbols dfs = new DateFormatSymbols();
-        System.out.println("\t\t Checking weekday array: "+ dfs.getWeekdays().toString());
         int i = 0;
         for(String day: dfs.getWeekdays()){
             dayMap.put(i,day);

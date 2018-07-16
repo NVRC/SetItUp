@@ -32,6 +32,7 @@ import threeblindmice.setitup.databinding.FragmentContactsBinding;
 import threeblindmice.setitup.databinding.ItemContactBinding;
 import threeblindmice.setitup.events.QueryEvent;
 import threeblindmice.setitup.events.RefreshContactListEvent;
+import threeblindmice.setitup.listeners.DayOnClickListener;
 import threeblindmice.setitup.model.Contact;
 import threeblindmice.setitup.model.ContactsModel;
 import threeblindmice.setitup.util.SalientCalendarContainer;
@@ -49,6 +50,19 @@ public class ContactsFragment extends Fragment {
     private ContactsModel mContactsModel;
     private ContactAdapter mContactAdapter;
     private FragmentContactsBinding binding;
+
+    //  Constants
+    private static final int LEFT_SEL_ID = 0;
+    private static final int RIGHT_SEL_ID = 1;
+    private static final int[] WEEK_IDS = {
+            303,
+            304,
+            305,
+            306,
+            307,
+            308,
+            309
+    };
 
 
 
@@ -192,20 +206,21 @@ public class ContactsFragment extends Fragment {
             llParams.setMargins(marginSides,margin,marginSides,margin);
             navLinearLayout.setBackgroundColor(ResourcesCompat.getColor(getResources(), R.color.primary_light, null));
 
-
-
             //  Init left and right week selectors
             ImageView leftSelector = new ImageView(mContext);
+            leftSelector.setId(LEFT_SEL_ID);
+            leftSelector.setOnClickListener(this);
             leftSelector.setImageResource(R.drawable.ic_baseline_chevron_left_24px);
             LinearLayout.LayoutParams leftSelParams = new LinearLayout.LayoutParams(
                     weekSelectorSize,
                     weekSelectorSize);
-            leftSelParams.gravity = Gravity.START;
+            leftSelParams.gravity = Gravity.CENTER_HORIZONTAL;
             leftSelParams.setMargins(margin,margin,margin,0);
             leftSelector.setLayoutParams(leftSelParams);
 
             TextView tvLeft = new TextView(mContext);
-            tvLeft.setText(sCC.getLeftMonth() + " " + sCC.getLeftDay());
+            String leftString = sCC.getLeftMonth() + " " + sCC.getLeftDay();
+            tvLeft.setText(leftString);
             LinearLayout.LayoutParams leftTextParams = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -221,7 +236,8 @@ public class ContactsFragment extends Fragment {
             divider.setLayoutParams(dividerParams);
 
             TextView tvRight = new TextView(mContext);
-            tvRight.setText(sCC.getRightMonth() + " " + sCC.getRightDay());
+            String rightString = sCC.getRightMonth() + " " + sCC.getRightDay();
+            tvRight.setText(rightString);
             LinearLayout.LayoutParams rightTextParams = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -230,10 +246,12 @@ public class ContactsFragment extends Fragment {
 
 
             ImageView rightSelector = new ImageView(mContext);
+            rightSelector.setId(RIGHT_SEL_ID);
+            rightSelector.setOnClickListener(this);
             LinearLayout.LayoutParams rightSelParams = new LinearLayout.LayoutParams(
                     weekSelectorSize,
                     weekSelectorSize);
-            rightSelParams.gravity = Gravity.RIGHT;
+            rightSelParams.gravity = Gravity.CENTER_HORIZONTAL;
             rightSelector.setImageResource(R.drawable.ic_baseline_chevron_right_24px);
             rightSelector.setLayoutParams(rightSelParams);
 
@@ -244,16 +262,15 @@ public class ContactsFragment extends Fragment {
             navLinearLayout.addView(rightSelector);
             childrenLayout.addView(navLinearLayout, llParams);
 
-
+            int i = 0;
             for (String day : sCC.getDayArray()){
                 //  TODO: Style textviews
                 TextView tv = new TextView(mContext);
 
                 int padding = getResources().getDimensionPixelSize(R.dimen.week_selector_padding);
                 tv.setPadding(padding,padding,padding,padding);
-
-
                 tv.setText(day);
+                tv.setId(WEEK_IDS[i]);
                 LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
                         tileHeight);
@@ -262,16 +279,31 @@ public class ContactsFragment extends Fragment {
                 tv.setGravity(Gravity.CENTER_HORIZONTAL);
                 tv.setBackgroundColor(ResourcesCompat.getColor(getResources(), R.color.primary_light, null));
 
+                tv.setOnClickListener(new DayOnClickListener(day));
                 childrenLayout.addView(tv, layoutParams);
+                i++;
 
             }
-
+            //  Binding MVVM
             mBinding.setViewModel(new ContactViewModel());
         }
 
         public void bind(Contact contact){
             mBinding.getViewModel().setContact(contact);
             mBinding.executePendingBindings();
+        }
+
+        private void updateUI(){
+            String[] temp = sCC.getDayArray();
+            for (int i = 0; i < SalientCalendarContainer.NUM_WEEKDAYS; i++){
+                TextView tv = getActivity().findViewById(WEEK_IDS[0]);
+                if (tv != null){
+                    System.out.println("VIEW NULL");
+
+                    tv.setText(temp[i]);
+                }
+            }
+
         }
 
         @Override
@@ -283,13 +315,18 @@ public class ContactsFragment extends Fragment {
                 } else {
                     childrenLayout.setVisibility(View.VISIBLE);
                 }
-            } else {
-
-                //  Handle clicking other item
-
+            } else if (view.getId() == LEFT_SEL_ID) {
+                System.out.println("LEFT SEL");
+                sCC.decrementWeek();
+                updateUI();
+            } else if (view.getId() == RIGHT_SEL_ID) {
+                System.out.println("RIGHT SEL");
+                sCC.incrementWeek();
+                updateUI();
             }
         }
     }
+
 
     private class ContactAdapter extends RecyclerView.Adapter<ContactHolder> implements SectionTitleProvider{
         private SortedList<Contact> mData;
