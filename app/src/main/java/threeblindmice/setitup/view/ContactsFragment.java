@@ -96,7 +96,8 @@ public class ContactsFragment extends Fragment {
         super.onCreate(savedInstanceState);
         EventBus.getDefault().register(this);
         mContactAdapter = new ContactAdapter();
-        mContactsModel = new ContactsModel(getActivity());
+
+        mContactsModel = new ContactsModel(getContext());
     }
 
     @Override
@@ -136,33 +137,61 @@ public class ContactsFragment extends Fragment {
 
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onUpdate(RefreshContactListEvent event){
-        State tempState = event.getState();
-        if(tempState == State.INIT){
-            mContactAdapter.clear();
-            mContactAdapter.addAll(event.getContacts());
-        } else if (tempState == State.SINGLE){
-            int pos;
-            Contact contact = event.getContact();
-            //  All animations, sorting, etc. handled by SortedListAdapter for RecyclerView
-            if(event.getFlag()){
-                //  Add condition
-                mContactAdapter.addItem(contact);
-            } else if (!event.getFlag()) {
-                //  Remove condition
-                mContactAdapter.removeItem(contact);
+        final RefreshContactListEvent eventPointer = event;
+        getActivity().runOnUiThread(new Runnable(){
+            @Override
+            public void run() {
+
+                if(eventPointer.getState() == State.INIT){
+                    mContactAdapter.clear();
+                    mContactAdapter.addAll(eventPointer.getContacts());
+                } else if (eventPointer.getState() == State.SINGLE){
+                    int pos;
+                    Contact contact = eventPointer.getContact();
+                    //  All animations, sorting, etc. handled by SortedListAdapter for RecyclerView
+                    if(eventPointer.getFlag()){
+                        //  Add condition
+                        mContactAdapter.addItem(contact);
+                    } else if (!eventPointer.getFlag()) {
+                        //  Remove condition
+                        mContactAdapter.removeItem(contact);
+                    }
+                }
             }
-        }
+        });
+
+
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void handleQueryEvent(QueryEvent event){
-        // Here is where we are going to implement the filter logic
+        // Implement the filter logic
         List<Contact> filteredModelList = filter(mContactAdapter.getDataList(), event.getQuery());
         if(filteredModelList.size() > 0){
             mContactAdapter.clear();
             mContactAdapter.addAll(filteredModelList);
         }
         binding.recyclerView.scrollToPosition(0);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void updateUIComponent(UpdateUIComponentEvent event) {
+       final UpdateUIComponentEvent currEvent = event;
+        getActivity().runOnUiThread(new Runnable(){
+            @Override
+            public void run() {
+                Object payload = currEvent.getPayload();
+                View view = getActivity().findViewById(currEvent.getView());
+                if (payload instanceof String && view instanceof TextView) {
+
+                    System.out.println("Updating a UI component" + payload);
+                    ((TextView) view).setText((String) payload);
+                } else if (payload instanceof Integer) {
+                    //  TODO: Use if needed
+                }
+            }
+        });
+
     }
 
 

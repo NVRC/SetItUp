@@ -24,10 +24,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import org.greenrobot.eventbus.EventBus;
@@ -37,7 +35,6 @@ import org.greenrobot.eventbus.ThreadMode;
 import threeblindmice.setitup.R;
 import threeblindmice.setitup.events.QueryEvent;
 import threeblindmice.setitup.events.UpdateFragmentEvent;
-import threeblindmice.setitup.events.UpdateUIComponentEvent;
 
 
 /**
@@ -255,18 +252,6 @@ public class ContactsActivity extends AppCompatActivity {
 
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void updateUIComponent(UpdateUIComponentEvent event) {
-        Object payload = event.getPayload();
-        View view = findViewById(event.getView());
-        if (payload instanceof String && view instanceof TextView) {
-
-            System.out.println("Updating a UI component" + payload);
-            ((TextView) view).setText((String) payload);
-        } else if (payload instanceof Integer) {
-            //  TODO: Use if needed
-        }
-    }
 
 
 
