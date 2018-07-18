@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.Map;
 
 import threeblindmice.setitup.util.SalientCalendarContainer;
@@ -19,7 +20,10 @@ public class SalientCalendarContainerUnitTest {
     Map<Integer,String> monthMap;
     @Before
     public void setup(){
+
+        //  Modify Calendar to test multiple yearly boundary conditions
         calendar = Calendar.getInstance();
+
         sCC = new SalientCalendarContainer(calendar);
         dayMap = sCC.generateDayMap();
         monthMap = sCC.generateMonthMap();
@@ -56,8 +60,10 @@ public class SalientCalendarContainerUnitTest {
 
     @Test
     public void SalientCalendarContainerUtil_CalculateMonthRollover_ExpectedResults(){
-        int offset = 1;
-        int maxInMonth = calendar.getMaximum(calendar.get(Calendar.MONTH));
+        int offset = 3;
+        // Create a calendar object and set year and month
+
+        int maxInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
         int dayInMonth = maxInMonth + offset;
         assertEquals(offset,sCC.calculateMonthRollover(dayInMonth,maxInMonth));
     }
@@ -78,7 +84,7 @@ public class SalientCalendarContainerUnitTest {
     public void SalientCalendarContainer_Constructor_MatchCurrentDate(){
         int currDayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
         int currMonth = calendar.get(Calendar.MONTH);
-        int maxOfMonth = calendar.getMaximum(currMonth);
+        int maxOfMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
 
         assertEquals(sCC.getLeftDay(),currDayOfMonth);
         assertEquals(sCC.getLeftMonth(),monthMap.get(currMonth));
@@ -96,12 +102,58 @@ public class SalientCalendarContainerUnitTest {
 
     @Test
     public void SalientCalendarContainer_IncrementWeek_MatchExpectedDate() {
+
+
+        int currMonth = (int) sCC.getKeyFromValue(monthMap,sCC.getRightMonth());
+        int maxOfMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+        int currDay = sCC.getRightDay()+1;
+        int rollover = sCC.calculateMonthRollover(currDay, maxOfMonth);
+        int year = calendar.get(Calendar.YEAR);
+        //  Month roll over
+        if (rollover < currDay){
+            if(currMonth <= 11){
+                currMonth++;
+            } else {
+                currMonth = 0;
+                year++;
+            }
+
+            Calendar calendar = new GregorianCalendar(year, currMonth, rollover);
+
+
+        }
+        int leftMonth = currMonth;
+
+        //  Add the week
         sCC.incrementWeek();
+        int weekAddedDay = currDay + SalientCalendarContainer.NUM_WEEKDAYS;
+        maxOfMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+        int newDay = sCC.calculateMonthRollover(weekAddedDay, maxOfMonth);
+        //  Month roll over
+        if (newDay < weekAddedDay){
+            if(currMonth <= 11){
+                currMonth++;
+            } else {
+                currMonth = 1;
+            }
+        }
+        assertEquals(sCC.getLeftDay(), rollover);
+        assertEquals(sCC.getLeftMonth(), monthMap.get(leftMonth));
+        assertEquals(sCC.getRightDay(), newDay);
+        assertEquals(sCC.getRightMonth(), monthMap.get(currMonth));
+    }
 
+    @Test
+    public void SalientCalendarContainer_DecrementWeek_MatchExpectedDate(){
+/*
+        assertEquals(sCC.getLeftDay(), "");
+        assertEquals(sCC.getLeftMonth(), monthMap.get(""));
+        assertEquals(sCC.getRightDay(), "");
+        assertEquals(sCC.getRightMonth(), monthMap.get(""));
 
-
-
-
+        System.out.println("LEFT: "+ sCC.getLeftMonth()+sCC.getLeftDay());
+        System.out.println("RIGHT: "+ sCC.getRightMonth()+sCC.getRightDay());
+        */
     }
 
 

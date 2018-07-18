@@ -2,6 +2,7 @@ package threeblindmice.setitup.util;
 
 import java.text.DateFormatSymbols;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,6 +20,9 @@ public class SalientCalendarContainer {
     private int[][] weekArray;
     private Calendar calendar;
     private String[] dayArray;
+    private Map<Integer, String> monthMap;
+    private Map<Integer, String> dayMap;
+    private int year;
     //  TODO: Implement day suffix logic here
 
     public SalientCalendarContainer(Calendar cal){
@@ -27,12 +31,14 @@ public class SalientCalendarContainer {
         this.leftDay = 0;
         this.rightDay = 0;
         this.weekArray = new int[NUM_WEEKS_CACHED][7];
-        //  TODO: Handle date expression properly
         this.calendar = cal;
         this.dayArray = new String[NUM_WEEKDAYS];
         int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
         int daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
         int currMonth = calendar.get(Calendar.MONTH);
+        this.year = calendar.get(Calendar.YEAR);
+        dayMap = generateDayMap();
+        monthMap = generateMonthMap();
 
         buildVariables(currMonth,dayOfMonth,daysInMonth, FUTURE);
 
@@ -40,22 +46,23 @@ public class SalientCalendarContainer {
 
     private void buildVariables(int currMonth, int dayOfMonth,
                                 int daysInMonth, boolean directionInTime){
-        Map<Integer, String> dayMap = generateDayMap();
-        Map<Integer, String> monthMap = generateMonthMap();
+
 
         String monthString = monthMap.get(currMonth);
         setLeftMonthDay(monthString, dayOfMonth);
-        int firstDayNextWeek = dayOfMonth + NUM_WEEKDAYS;
-        if( firstDayNextWeek > daysInMonth){
-            int diff = firstDayNextWeek - daysInMonth;
-            setRightMonthDay(monthMap.get(currMonth + 1),diff);
+
+        int rightDay = calculateMonthRollover(dayOfMonth + NUM_WEEKDAYS, daysInMonth);
+        if (rightDay < dayOfMonth){
+            setRightMonthDay(monthMap.get(currMonth + 1),rightDay);
         } else {
-            setRightMonthDay(monthString, firstDayNextWeek);
+            setRightMonthDay(monthString, rightDay);
         }
+
+
 
         //  TODO: Populate sCC with additional weeks
         int i = 0;
-        int dayOfWeek = dayOfMonth%7;
+        int dayOfWeek = dayOfMonth%NUM_WEEKDAYS;
         if (directionInTime == FUTURE){
             for (int j = dayOfWeek; j < dayOfWeek + NUM_WEEKDAYS; j++) {
                 if (i >= NUM_WEEKDAYS){
@@ -85,21 +92,53 @@ public class SalientCalendarContainer {
     }
 
     public void incrementWeek(){
-        Map<Integer, String> dayMap = generateDayMap();
-        Map<Integer, String> monthMap = generateMonthMap();
-        int currMonth = (int) getKeyFromValue(monthMap, getRightMonth());
-        buildVariables(currMonth,
-                rightDay,
-                calendar.get(currMonth), FUTURE);
+        int currMonth = (int) getKeyFromValue(monthMap,getRightMonth());
+        int currDay = getRightDay()+1;
+        Calendar cal = new GregorianCalendar(year, currMonth, getRightDay());
+        int maxOfMonth = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
+
+        int rollover = calculateMonthRollover(currDay, maxOfMonth);
+        //  Month roll over
+        if (rollover < currDay){
+            if(currMonth <= 12){
+                currMonth++;
+            } else {
+                incrementYear();
+                currMonth = 1;
+            }
+
+        }
+        buildVariables(currMonth,rollover,cal.getActualMaximum(Calendar.DAY_OF_MONTH),SalientCalendarContainer.FUTURE);
+
+    }
+
+    private void incrementYear(){
+        this.year++;
+    }
+
+    private void decrementYear(){
+        this.year--;
     }
 
     public void decrementWeek(){
-        Map<Integer, String> dayMap = generateDayMap();
-        Map<Integer, String> monthMap = generateMonthMap();
-        int currMonth = (int) getKeyFromValue(monthMap, getLeftMonth());
-        buildVariables(currMonth,
-                getLeftDay(),
-                calendar.get(currMonth), PAST);
+        int currMonth = (int) getKeyFromValue(monthMap,getLeftMonth());
+        int currDay = getLeftDay()-1;
+        Calendar cal = new GregorianCalendar(year, currMonth, getLeftDay());
+        int maxOfMonth = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
+        int rollover = calculateMonthRollover(currDay, maxOfMonth);
+        //  Month roll over
+        if (rollover > currDay){
+            if(currMonth <= 1){
+                currMonth = 12;
+                decrementYear();
+
+            } else {
+                currMonth--;
+            }
+
+        }
+
+        buildVariables(currMonth,rollover,cal.getActualMaximum(Calendar.DAY_OF_MONTH),SalientCalendarContainer.PAST);
 
     }
 
