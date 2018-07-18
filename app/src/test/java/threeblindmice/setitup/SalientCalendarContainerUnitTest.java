@@ -21,9 +21,9 @@ public class SalientCalendarContainerUnitTest {
     @Before
     public void setup(){
 
-        //  Modify Calendar to test multiple yearly boundary conditions
+        //  TODO:  Modify Calendar to test multiple yearly boundary conditions
+        //  calendar = new GregorianCalendar(2018,10,20);
         calendar = Calendar.getInstance();
-
         sCC = new SalientCalendarContainer(calendar);
         dayMap = sCC.generateDayMap();
         monthMap = sCC.generateMonthMap();
@@ -145,6 +145,9 @@ public class SalientCalendarContainerUnitTest {
 
     @Test
     public void SalientCalendarContainer_DecrementWeek_MatchExpectedDate(){
+
+        // TODO
+
 /*
         assertEquals(sCC.getLeftDay(), "");
         assertEquals(sCC.getLeftMonth(), monthMap.get(""));

@@ -122,24 +122,20 @@ public class SalientCalendarContainer {
 
     public void decrementWeek(){
         int currMonth = (int) getKeyFromValue(monthMap,getLeftMonth());
-        int currDay = getLeftDay()-1;
-        Calendar cal = new GregorianCalendar(year, currMonth, getLeftDay());
-        int maxOfMonth = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
-        int rollover = calculateMonthRollover(currDay, maxOfMonth);
-        //  Month roll over
-        if (rollover > currDay){
-            if(currMonth <= 1){
-                currMonth = 12;
+        int currDay = getLeftDay()-NUM_WEEKDAYS-1;
+        int maxOfMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+        if (currDay <= 0){
+            if (currMonth == Calendar.DECEMBER) {
                 decrementYear();
-
-            } else {
-                currMonth--;
+                currMonth = Calendar.JANUARY;
             }
-
+            currMonth--;
+            Calendar cal = new GregorianCalendar(year, currMonth, 5);
+            maxOfMonth = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
+            currDay = maxOfMonth - Math.abs(currDay);
         }
 
-        buildVariables(currMonth,rollover,cal.getActualMaximum(Calendar.DAY_OF_MONTH),SalientCalendarContainer.PAST);
-
+        buildVariables( currMonth, currDay, maxOfMonth, PAST);
     }
 
     public void setLeftMonthDay(String month, int day){
