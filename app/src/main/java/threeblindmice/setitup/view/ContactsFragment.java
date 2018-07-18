@@ -25,6 +25,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import threeblindmice.setitup.R;
@@ -215,7 +216,7 @@ public class ContactsFragment extends Fragment {
             super(binding.getRoot());
             mBinding = binding;
 
-            sCC = new SalientCalendarContainer();
+            sCC = new SalientCalendarContainer(Calendar.getInstance());
 
             mContext = mBinding.getRoot().getContext();
             childrenLayout = mBinding.getRoot().findViewById(R.id.contact_tile_child_container);

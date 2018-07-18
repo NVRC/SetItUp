@@ -21,15 +21,15 @@ public class SalientCalendarContainer {
     private String[] dayArray;
     //  TODO: Implement day suffix logic here
 
-    public SalientCalendarContainer(){
-        leftMonth = null;
-        rightMonth = null;
-        leftDay = 0;
-        rightDay = 0;
-        weekArray = new int[NUM_WEEKS_CACHED][7];
+    public SalientCalendarContainer(Calendar cal){
+        this.leftMonth = null;
+        this.rightMonth = null;
+        this.leftDay = 0;
+        this.rightDay = 0;
+        this.weekArray = new int[NUM_WEEKS_CACHED][7];
         //  TODO: Handle date expression properly
-        calendar = Calendar.getInstance();
-        dayArray = new String[NUM_WEEKDAYS];
+        this.calendar = cal;
+        this.dayArray = new String[NUM_WEEKDAYS];
         int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
         int daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
         int currMonth = calendar.get(Calendar.MONTH);
@@ -38,7 +38,8 @@ public class SalientCalendarContainer {
 
     }
 
-    private void buildVariables(int currMonth, int dayOfMonth, int daysInMonth, boolean directionInTime){
+    private void buildVariables(int currMonth, int dayOfMonth,
+                                int daysInMonth, boolean directionInTime){
         Map<Integer, String> dayMap = generateDayMap();
         Map<Integer, String> monthMap = generateMonthMap();
 
@@ -56,7 +57,6 @@ public class SalientCalendarContainer {
         int i = 0;
         int dayOfWeek = dayOfMonth%7;
         if (directionInTime == FUTURE){
-            System.out.println("\t\tFuture\t\t Day Of Week: "+dayOfWeek + "\t\t Day of Month: "+dayOfMonth);
             for (int j = dayOfWeek; j < dayOfWeek + NUM_WEEKDAYS; j++) {
                 if (i >= NUM_WEEKDAYS){
                     break;
@@ -67,9 +67,6 @@ public class SalientCalendarContainer {
                 //  Display (Today) on the first Day
                 dayArray[i] = ( i == 0 ) ? "Today "+"("+ dayMap.get(j) +")" : dayMap.get(j) ;
                 i++;
-            }
-            for (String day : dayArray){
-                System.out.println(day);
             }
         } else if (directionInTime == PAST){
             int temp = calendar.get(Calendar.DAY_OF_WEEK);
@@ -91,7 +88,6 @@ public class SalientCalendarContainer {
         Map<Integer, String> dayMap = generateDayMap();
         Map<Integer, String> monthMap = generateMonthMap();
         int currMonth = (int) getKeyFromValue(monthMap, getRightMonth());
-        System.out.println("\t\tRight Day: "+getRightDay());
         buildVariables(currMonth,
                 rightDay,
                 calendar.get(currMonth), FUTURE);
@@ -108,13 +104,13 @@ public class SalientCalendarContainer {
     }
 
     public void setLeftMonthDay(String month, int day){
-        leftMonth = month;
-        leftDay = day;
+        this.leftMonth = month;
+        this.leftDay = day;
     }
 
     public void setRightMonthDay(String month, int day){
-        rightMonth = month;
-        rightDay = day;
+        this.rightMonth = month;
+        this.rightDay = day;
     }
 
     public String getLeftMonth(){
@@ -137,7 +133,7 @@ public class SalientCalendarContainer {
     }
 
     //  Helper Functions
-    private Object getKeyFromValue(Map hm, Object value) {
+    public Object getKeyFromValue(Map hm, Object value) {
         for (Object o : hm.keySet()) {
             if (hm.get(o).equals(value)) {
                 return o;
@@ -147,7 +143,8 @@ public class SalientCalendarContainer {
     }
 
 
-    private Map<Integer, String> generateDayMap(){
+    // {0=, 1=Sunday, 2=Monday, 3=Tuesday, 4=Wednesday, 5=Thursday, 6=Friday, 7=Saturday}
+    public Map<Integer, String> generateDayMap(){
         //  TODO: Optimize by using SparseIntArray to avoid auto-boxing int to Integer
         Map<Integer, String> dayMap = new HashMap<>();
         DateFormatSymbols dfs = new DateFormatSymbols();
@@ -158,17 +155,30 @@ public class SalientCalendarContainer {
         }
         return dayMap;
     }
-
-    private Map<Integer, String> generateMonthMap(){
+//  {1=January, 2=February, 3=March, 4=April, 5=May, 6=June, 7=July,
+//      8=August, 9=September, 10=October, 11=November, 12=December, 13=}
+    public Map<Integer, String> generateMonthMap(){
         //  TODO: Optimize by using SparseIntArray to avoid auto-boxing int to Integer
         Map<Integer, String> monthMap = new HashMap<>();
         DateFormatSymbols dfs = new DateFormatSymbols();
         int i = 0;
-        for(String day: dfs.getMonths()){
-            monthMap.put(i,day);
+        for(String month: dfs.getMonths()){
+            monthMap.put(i,month);
             i++;
         }
         return monthMap;
+    }
+
+    public int calculateMonthRollover(int currDay, int maxOfMonth){
+        //  Compute any expected monthly rollover changes
+        int target;
+        if (currDay > maxOfMonth){
+            target = currDay - maxOfMonth;
+
+        } else {
+            target = currDay;
+        }
+        return target;
     }
 
 }
