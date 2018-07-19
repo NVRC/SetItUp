@@ -99,11 +99,10 @@ public class LocalContactThread extends Thread {
                         if (inputStream != null) {
 
                             photo = BitmapFactory.decodeStream(inputStream);
-                            System.out.println("Set photo for "+id);
                             tempContact.setPhoto(photo);
                             inputStream.close();
                         } else {
-                            System.out.println(id +" has no photo");
+                            // TODO: Handle no profile IMG
                         }
 
                     } catch (IOException e) {
