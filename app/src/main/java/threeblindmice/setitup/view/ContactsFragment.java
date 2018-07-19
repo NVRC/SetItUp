@@ -86,8 +86,15 @@ public class ContactsFragment extends Fragment {
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         binding.recyclerView.setAdapter(mContactAdapter);
-        FastScroller fastScroller = getActivity().findViewById(R.id.fastscroll);
-        fastScroller.setRecyclerView(binding.recyclerView);
+        try{
+            FastScroller fastScroller = getActivity().findViewById(R.id.fastscroll);
+            fastScroller.setRecyclerView(binding.recyclerView);
+        } catch (NullPointerException e){
+            e.printStackTrace();
+        }
+
+
+
 
         return binding.getRoot();
     }
