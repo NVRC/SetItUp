@@ -7,7 +7,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -84,12 +83,12 @@ public class Contact  implements Comparable<String>{
 
 
     // Returns a String Object of the identity hash in Base64 representation
-    @TargetApi(26)
+    @TargetApi(23)
     private String generateHash(String seed) {
         try {
             MessageDigest digestContainer = MessageDigest.getInstance("SHA-256");
             digestContainer.update(seed.getBytes());
-            return new String(Base64.getEncoder().encodeToString(digestContainer.digest()));
+            return new String(android.util.Base64.encodeToString(digestContainer.digest(), android.util.Base64.DEFAULT));
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }

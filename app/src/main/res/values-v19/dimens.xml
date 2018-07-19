@@ -38,6 +38,11 @@
     <dimen name="contact_tile_name_padding_top">24dp</dimen>
     <dimen name="contact_tile_name_text_size">16sp</dimen>
 
+    <dimen name="week_selectors">24dp</dimen>
+    <dimen name="week_selector_margin">2dp</dimen>
+    <dimen name="week_selector_padding">8dp</dimen>
+    <dimen name="week_selector_height">40dp</dimen>
+
 
 
 

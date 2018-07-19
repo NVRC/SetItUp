@@ -245,6 +245,7 @@ public class ContactsActivity extends AppCompatActivity {
     }
 
 
+
     @Override
     public void onActivityResult(int requestCode,int resultCode, Intent intent){
         super.onActivityResult(requestCode,resultCode,intent);
@@ -258,7 +259,8 @@ public class ContactsActivity extends AppCompatActivity {
 
 
 
-    // TODO: Handle Api lvls < 23 with conditional execution
+
+        // TODO: Handle Api lvls < 23 with conditional execution
     @TargetApi(23)
     // Called when the user is performing an action which requires the app to read the
     // user's contacts
