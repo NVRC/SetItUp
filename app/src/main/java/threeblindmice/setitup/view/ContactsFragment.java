@@ -313,6 +313,7 @@ public class ContactsFragment extends Fragment {
             mBinding.getViewModel().setContact(contact);
             mBinding.executePendingBindings();
         }
+
         @Subscribe(threadMode = ThreadMode.MAIN)
         public void updateUIComponent(UpdateUIComponentEvent event) {
             final UpdateUIComponentEvent currEvent = event;

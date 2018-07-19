@@ -33,6 +33,10 @@ public class Contact  implements Comparable<String>{
         this.hash = generateHash(generateDigest());
     }
 
+    public Contact(){
+        this("temp");
+    }
+
     private String generateDigest(){
         return name;
     }
@@ -40,6 +44,8 @@ public class Contact  implements Comparable<String>{
     public String getName(){
         return name;
     }
+
+    public void setName(String newName) { this.name = newName; }
 
     public void setPhoto(Bitmap newPhoto){
         this.photo = newPhoto;
