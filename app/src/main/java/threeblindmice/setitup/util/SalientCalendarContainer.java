@@ -76,17 +76,15 @@ public class SalientCalendarContainer {
                 i++;
             }
         } else if (directionInTime == PAST){
-            int temp = calendar.get(Calendar.DAY_OF_WEEK);
-            for (int j = temp; j < 8; j--) {
-                if (i >= NUM_WEEKDAYS){
-                    break;
-                }
-                if(j == 1){
-                    j = 7;
+            int j = dayOfWeek;
+            for (int k = 0; k < NUM_WEEKDAYS; k++) {
+
+                if(j > NUM_WEEKDAYS){
+                    j = 1;
                 }
                 //  Display (Today) on the first Day
-                dayArray[i] = ( i == 0 ) ? "Today "+"("+ dayMap.get(j) +")" : dayMap.get(j) ;
-                i++;
+                dayArray[k] = ( k == 0 ) ? "Today "+"("+ dayMap.get(j) +")" : dayMap.get(j) ;
+                j++;
             }
         }
     }

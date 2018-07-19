@@ -173,27 +173,10 @@ public class ContactsFragment extends Fragment {
             mContactAdapter.addAll(filteredModelList);
         }
         binding.recyclerView.scrollToPosition(0);
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void updateUIComponent(UpdateUIComponentEvent event) {
-        final UpdateUIComponentEvent currEvent = event;
-        getActivity().runOnUiThread(new Runnable(){
-            @Override
-            public void run() {
-                Object payload = currEvent.getPayload();
-                View view = getActivity().findViewById(currEvent.getView());
-                if (payload instanceof String && view instanceof TextView) {
-
-                    System.out.println("Updating a UI component" + payload);
-                    ((TextView) view).setText((String) payload);
-                } else if (payload instanceof Integer) {
-                    //  TODO: Use if needed
-                }
-            }
-        });
 
     }
+
+
 
 
 
@@ -216,12 +199,15 @@ public class ContactsFragment extends Fragment {
         private ContactHolder(ItemContactBinding binding){
             super(binding.getRoot());
             mBinding = binding;
-
+            EventBus.getDefault().register(this);
             sCC = new SalientCalendarContainer(Calendar.getInstance());
             mContext = mBinding.getRoot().getContext();
             childrenLayout = mBinding.getRoot().findViewById(R.id.contact_tile_child_container);
             mBinding.getRoot().findViewById(R.id.contact_tile_container).setOnClickListener(this);
             childrenLayout.setVisibility(View.GONE);
+
+            //  Fixes the duplicated expanded views
+            setIsRecyclable(false);
 
 
             //  Dimens
@@ -327,6 +313,26 @@ public class ContactsFragment extends Fragment {
             mBinding.getViewModel().setContact(contact);
             mBinding.executePendingBindings();
         }
+        @Subscribe(threadMode = ThreadMode.MAIN)
+        public void updateUIComponent(UpdateUIComponentEvent event) {
+            final UpdateUIComponentEvent currEvent = event;
+            getActivity().runOnUiThread(new Runnable(){
+                @Override
+                public void run() {
+                    Object payload = currEvent.getPayload();
+                    View view = mBinding.getRoot().findViewById(currEvent.getView());
+                    if (payload instanceof String && view instanceof TextView) {
+
+
+                        ((TextView) view).setText((String) payload);
+                    } else if (payload instanceof Integer) {
+                        //  TODO: Use if needed
+                    }
+                }
+            });
+
+        }
+
 
         private void updateUI(){
             String[] temp = sCC.getDayArray();
@@ -485,9 +491,8 @@ public class ContactsFragment extends Fragment {
         @Override
         public void onBindViewHolder(ContactHolder holder, int position){
             Contact contact = mData.get(position);
-
             //  Fixes recyclerView expandable item duplication
-            holder.setIsRecyclable(false);
+
             holder.bind(contact);
         }
 
