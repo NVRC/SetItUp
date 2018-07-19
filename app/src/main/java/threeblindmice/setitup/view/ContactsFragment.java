@@ -177,7 +177,7 @@ public class ContactsFragment extends Fragment {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void updateUIComponent(UpdateUIComponentEvent event) {
-       final UpdateUIComponentEvent currEvent = event;
+        final UpdateUIComponentEvent currEvent = event;
         getActivity().runOnUiThread(new Runnable(){
             @Override
             public void run() {
@@ -194,6 +194,7 @@ public class ContactsFragment extends Fragment {
         });
 
     }
+
 
 
 
@@ -217,7 +218,6 @@ public class ContactsFragment extends Fragment {
             mBinding = binding;
 
             sCC = new SalientCalendarContainer(Calendar.getInstance());
-
             mContext = mBinding.getRoot().getContext();
             childrenLayout = mBinding.getRoot().findViewById(R.id.contact_tile_child_container);
             mBinding.getRoot().findViewById(R.id.contact_tile_container).setOnClickListener(this);
@@ -378,6 +378,7 @@ public class ContactsFragment extends Fragment {
                 updateUI();
             }
         }
+
     }
 
 
@@ -484,6 +485,9 @@ public class ContactsFragment extends Fragment {
         @Override
         public void onBindViewHolder(ContactHolder holder, int position){
             Contact contact = mData.get(position);
+
+            //  Fixes recyclerView expandable item duplication
+            holder.setIsRecyclable(false);
             holder.bind(contact);
         }
 
