@@ -25,11 +25,11 @@
                 android:layout_marginLeft="@dimen/contact_tile_img_padding"
                 android:layout_width="@dimen/contact_tile_img_size"
                 android:layout_height="@dimen/contact_tile_img_size"
-                android:padding="@dimen/contact_tile_padding"
                 android:textAllCaps="false"
+                bind:imageBitmap="@{viewModel.photo}"
                 android:background="@color/primary_dark"
                 />
-            <!--bind:imageBitmap="@{viewModel.photo}"-->
+            <!-- bind:imageBitmap="@{viewModel.photo}"-->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

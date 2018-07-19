@@ -84,18 +84,26 @@ public class LocalContactThread extends Thread {
                     null, null, null, null);
             if (cur.getCount() > 0) {
                 while (cur.moveToNext()) {
+                    Contact tempContact = new Contact();
                     int idLong = cur.getColumnIndex(ContactsContract.Contacts._ID);
-                    String id = cur.getString(idLong);
+                    String id = cur.getString(cur.getColumnIndex(ContactsContract.Contacts._ID));
+
                     String name = cur.getString(cur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+                    tempContact.setName(name);
                     Bitmap photo = null;
 
                     try {
                         InputStream inputStream = ContactsContract.Contacts.openContactPhotoInputStream(cr,
-                                ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, idLong));
+                                ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, new Long(id)));
 
                         if (inputStream != null) {
+
                             photo = BitmapFactory.decodeStream(inputStream);
+                            System.out.println("Set photo for "+id);
+                            tempContact.setPhoto(photo);
                             inputStream.close();
+                        } else {
+                            System.out.println(id +" has no photo");
                         }
 
                     } catch (IOException e) {
@@ -103,8 +111,8 @@ public class LocalContactThread extends Thread {
                     }
 
 
-                    Contact tempContact = new Contact(name);
-                    tempContact.setPhoto(photo);
+
+
                     if (Integer.parseInt(cur.getString(
                             cur.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {
                         Cursor pCur = cr.query(
