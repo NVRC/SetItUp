@@ -146,6 +146,9 @@ public class SalientCalendarContainer {
         this.rightDay = day;
     }
 
+    public int getYear() {
+        return year;
+    }
     public String getLeftMonth(){
         return leftMonth;
     }
