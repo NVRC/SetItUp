@@ -249,7 +249,6 @@ public class ContactsActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode,int resultCode, Intent intent){
         super.onActivityResult(requestCode,resultCode,intent);
-
     }
 
 

@@ -500,7 +500,7 @@ public class ContactsFragment extends Fragment {
         public void onBindViewHolder(ContactHolder holder, int position){
             Contact contact = mData.get(position);
             //  Fixes recyclerView expandable item duplication
-
+            holder.setIsRecyclable(false);
             holder.bind(contact);
         }
 
