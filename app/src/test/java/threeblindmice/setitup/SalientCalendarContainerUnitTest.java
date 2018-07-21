@@ -14,7 +14,7 @@ import static org.junit.Assert.assertEquals;
 public class SalientCalendarContainerUnitTest {
     String testMonth = "January";
     int testDay = 1;
-    Calendar calendar;
+    Calendar calendar, tempCal;
     SalientCalendarContainer sCC;
     Map<Integer,String> dayMap;
     Map<Integer,String> monthMap;
@@ -22,8 +22,8 @@ public class SalientCalendarContainerUnitTest {
     public void setup(){
 
         //  TODO:  Modify Calendar to test multiple yearly boundary conditions
-        //  calendar = new GregorianCalendar(2018,10,20);
-        calendar = Calendar.getInstance();
+        calendar = new GregorianCalendar(2018,7,29);
+        tempCal = new GregorianCalendar(2018,8,4);
         sCC = new SalientCalendarContainer(calendar);
         dayMap = sCC.generateDayMap();
         monthMap = sCC.generateMonthMap();
@@ -82,84 +82,35 @@ public class SalientCalendarContainerUnitTest {
 
     @Test
     public void SalientCalendarContainer_Constructor_MatchCurrentDate(){
-        int currDayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
-        int currMonth = calendar.get(Calendar.MONTH);
-        int maxOfMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
 
-        assertEquals(sCC.getLeftDay(),currDayOfMonth);
-        assertEquals(sCC.getLeftMonth(),monthMap.get(currMonth));
+        assertEquals(sCC.getLeftDay(),calendar.get(Calendar.DAY_OF_MONTH));
+        assertEquals(sCC.getKeyFromValue(monthMap,sCC.getLeftMonth()),calendar.get(Calendar.MONTH));
+        assertEquals(sCC.getYear(), calendar.get(Calendar.YEAR));
 
-        int rollover = sCC.calculateMonthRollover(
-                currDayOfMonth + SalientCalendarContainer.NUM_WEEKDAYS,maxOfMonth);
-        if (rollover < currDayOfMonth){
-            currMonth++;
-        }
-
-        assertEquals(sCC.getRightDay(),rollover);
-        assertEquals(sCC.getRightMonth(),monthMap.get(currMonth));
+        assertEquals(sCC.getRightDay(),tempCal.get(Calendar.DAY_OF_MONTH));
+        assertEquals(sCC.getKeyFromValue(monthMap,sCC.getRightMonth()),tempCal.get(Calendar.MONTH));
+        assertEquals(sCC.getYear(), tempCal.get(Calendar.YEAR));
 
     }
 
     @Test
     public void SalientCalendarContainer_IncrementWeek_MatchExpectedDate() {
-
-
-        int currMonth = (int) sCC.getKeyFromValue(monthMap,sCC.getRightMonth());
-        int maxOfMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
-        int currDay = sCC.getRightDay()+1;
-        int rollover = sCC.calculateMonthRollover(currDay, maxOfMonth);
-        int year = calendar.get(Calendar.YEAR);
-        //  Month roll over
-        if (rollover < currDay){
-            if(currMonth <= 11){
-                currMonth++;
-            } else {
-                currMonth = 0;
-                year++;
-            }
-
-            Calendar calendar = new GregorianCalendar(year, currMonth, rollover);
-
-
-        }
-        int leftMonth = currMonth;
-
-        //  Add the week
         sCC.incrementWeek();
-        int weekAddedDay = currDay + SalientCalendarContainer.NUM_WEEKDAYS;
-        maxOfMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
-        int newDay = sCC.calculateMonthRollover(weekAddedDay, maxOfMonth);
-        //  Month roll over
-        if (newDay < weekAddedDay){
-            if(currMonth <= 11){
-                currMonth++;
-            } else {
-                currMonth = 1;
-            }
-        }
-        assertEquals(sCC.getLeftDay(), rollover);
-        assertEquals(sCC.getLeftMonth(), monthMap.get(leftMonth));
-        assertEquals(sCC.getRightDay(), newDay);
-        assertEquals(sCC.getRightMonth(), monthMap.get(currMonth));
+        calendar = new GregorianCalendar(2018,8,5);
+        tempCal = new GregorianCalendar(2018,8,11);
+        SalientCalendarContainer_Constructor_MatchCurrentDate();
     }
 
     @Test
     public void SalientCalendarContainer_DecrementWeek_MatchExpectedDate(){
+        sCC.decrementWeek();
+        calendar = new GregorianCalendar(2018,7,22);
+        tempCal = new GregorianCalendar(2018,7,28);
 
-        // TODO
-
-/*
-        assertEquals(sCC.getLeftDay(), "");
-        assertEquals(sCC.getLeftMonth(), monthMap.get(""));
-        assertEquals(sCC.getRightDay(), "");
-        assertEquals(sCC.getRightMonth(), monthMap.get(""));
-
+        SalientCalendarContainer_Constructor_MatchCurrentDate();
         System.out.println("LEFT: "+ sCC.getLeftMonth()+sCC.getLeftDay());
         System.out.println("RIGHT: "+ sCC.getRightMonth()+sCC.getRightDay());
-        */
+
     }
-
-
-
 
 }
