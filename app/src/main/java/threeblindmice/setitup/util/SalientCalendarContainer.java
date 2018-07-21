@@ -51,7 +51,7 @@ public class SalientCalendarContainer {
         String monthString = monthMap.get(currMonth);
         setLeftMonthDay(monthString, dayOfMonth);
 
-        int rightDay = calculateMonthRollover(dayOfMonth + NUM_WEEKDAYS, daysInMonth);
+        int rightDay = calculateMonthRollover(dayOfMonth + NUM_WEEKDAYS-1, daysInMonth);
         if (rightDay < dayOfMonth){
             setRightMonthDay(monthMap.get(currMonth + 1),rightDay);
         } else {

@@ -183,6 +183,7 @@ public class NavDrawerFragment extends Fragment implements NavInterface {
             }
         }
     }
+    
 
     //  Manage fragment transactions with IDs
     //  Notify the main activity to swap fragments
@@ -244,6 +245,7 @@ public class NavDrawerFragment extends Fragment implements NavInterface {
     private class onError implements Handler.Callback {
         @Override
         public boolean handleMessage(Message message){
+            //  TODO: failfast
             return true;
         }
     }
@@ -282,13 +284,13 @@ public class NavDrawerFragment extends Fragment implements NavInterface {
                     e.printStackTrace();
                 }
                 if (launch != null) {
-
-
-                    startActivityForResult(launch, AUTH_REQUEST);
+                    //System.out.println("\t\t launch init"+launch.getDataString());
+                    //startActivityForResult(launch, AUTH_REQUEST);
 
                 } else {
                     //  Authentication Token Already Captured
-                    System.out.println("\t\tALT");
+
+                    System.out.println("\t\tAuthentication token captured");
                 }
             }
         }
