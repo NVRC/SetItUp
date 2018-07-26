@@ -120,7 +120,7 @@ public class SalientCalendarContainer {
 
     public void decrementWeek(){
         int currMonth = (int) getKeyFromValue(monthMap,getLeftMonth());
-        int currDay = getLeftDay()-NUM_WEEKDAYS-1;
+        int currDay = getLeftDay()-NUM_WEEKDAYS;
         int maxOfMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
         if (currDay <= 0){
             if (currMonth == Calendar.DECEMBER) {
