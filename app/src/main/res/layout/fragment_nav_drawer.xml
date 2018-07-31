@@ -12,6 +12,7 @@
         android:orientation="vertical"
         android:padding="@dimen/activity_horizontal_margin"
         android:id="@+id/nav_header_container"
+        android:visibility="invisible"
         >
 
         <ImageView
@@ -50,6 +51,23 @@
             android:textColor="@color/primary_light"
             style="@style/Widget.AppCompat.Spinner"
             />
+
+    </LinearLayout>
+    <LinearLayout
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/drawer_header_height"
+        android:gravity="bottom"
+        android:background="@color/primary_dark"
+        android:orientation="vertical"
+        android:padding="@dimen/activity_horizontal_margin"
+        android:id="@+id/nav_header_container_signin"
+        >
+        <Button
+            android:id="@+id/sign_in_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SignIn"/>
 
     </LinearLayout>
     <LinearLayout
