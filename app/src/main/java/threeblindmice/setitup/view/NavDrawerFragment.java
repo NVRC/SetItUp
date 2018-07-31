@@ -145,14 +145,19 @@ public class NavDrawerFragment extends Fragment implements NavInterface {
         //  TODO: Do less hacky
         LinearLayout ll0 = (LinearLayout) getView().findViewById(R.id.nav_drawer_option_0);
         LinearLayout ll1 = (LinearLayout) getView().findViewById(R.id.nav_drawer_option_1);
+        LinearLayout ll2 = (LinearLayout) getView().findViewById(R.id.nav_drawer_option_2);
         OptionClickListener ocl0 = new OptionClickListener();
         OptionClickListener ocl1 = new OptionClickListener();
+        OptionClickListener ocl2 = new OptionClickListener();
         ocl0.setId(getString(R.string.contacts));
         ocl1.setId(getString(R.string.empty));
+        ocl2.setId(getString(R.string.sms));
         ocl0.setCallback(this);
         ocl1.setCallback(this);
+        ocl2.setCallback(this);
         ll0.setOnClickListener(ocl0);
         ll1.setOnClickListener(ocl1);
+        ll2.setOnClickListener(ocl2);
 
 
     }

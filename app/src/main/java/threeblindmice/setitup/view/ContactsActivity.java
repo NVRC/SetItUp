@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -47,6 +48,7 @@ public class ContactsActivity extends AppCompatActivity {
     //  TODO: Setup auto-configuring fragment switching
     private String TAG_EMPTY_FRAGMENT;
     private String TAG_CONTACTS_FRAGMENT;
+    private String TAG_SMS_FRAGMENT;
     private static final String TAG_NAV_FRAGMENT = "Nav";
     private static final int AUTH_REQUEST = 0;
 
@@ -58,6 +60,7 @@ public class ContactsActivity extends AppCompatActivity {
 
     // Identifier for the permission request
     private static final int READ_CONTACTS_PERMISSIONS_REQUEST = 1;
+    private static final int SMS_PERMISSIONS_REQUEST = 123;
 
 
 
@@ -76,6 +79,8 @@ public class ContactsActivity extends AppCompatActivity {
 
         TAG_EMPTY_FRAGMENT = getString(R.string.empty);
         TAG_CONTACTS_FRAGMENT = getString(R.string.contacts);
+        TAG_SMS_FRAGMENT = getString(R.string.sms);
+
         //  INIT toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -103,7 +108,24 @@ public class ContactsActivity extends AppCompatActivity {
         }
         getPermissionToReadUserContacts();
 
+// Check for compatible layout versions
+        if (findViewById(R.id.fragment_container) != null){
+            // If a previous state is being restored, return
 
+            if (savedInstanceState != null){
+                return;
+            }
+
+            SmsFragment sf = new SmsFragment();
+            // If an intent provides additional run-time params
+            //cf.setArguments(getIntent().getExtras());
+            FragmentTransaction trans = getSupportFragmentManager().beginTransaction();
+            trans.addToBackStack(TAG_SMS_FRAGMENT);
+            trans.replace(R.id.fragment_container, sf, TAG_SMS_FRAGMENT);
+
+            trans.commit();
+
+        }
 
         // Check for compatible layout versions
         if (findViewById(R.id.fragment_container) != null){
@@ -241,6 +263,20 @@ public class ContactsActivity extends AppCompatActivity {
                 trans.replace(R.id.fragment_container, new EmptyFragment(),TAG_EMPTY_FRAGMENT);
                 trans.commit();
             }
+        } else if (tag.equals(TAG_SMS_FRAGMENT)){
+
+            //  Other options... for now switch to empty fragment
+            // Insert the fragment by replacing any existing fragment
+            Fragment frag = fragmentManager.findFragmentByTag(TAG_CONTACTS_FRAGMENT);
+            if (frag == null){
+                frag = fragmentManager.findFragmentByTag(TAG_EMPTY_FRAGMENT);
+            }
+            if(frag != null && frag.isVisible()){
+                System.out.println("\t Entered SMS frag");
+                FragmentTransaction trans = getSupportFragmentManager().beginTransaction();
+                trans.replace(R.id.fragment_container, new SmsFragment(),TAG_SMS_FRAGMENT);
+                trans.commit();
+            }
         }
     }
 
@@ -286,6 +322,18 @@ public class ContactsActivity extends AppCompatActivity {
             requestPermissions(new String[]{Manifest.permission.READ_CONTACTS},
                     READ_CONTACTS_PERMISSIONS_REQUEST);
         }
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.SEND_SMS) !=
+                PackageManager.PERMISSION_GRANTED) {
+            System.out.println("No permission sms");
+            // Permission not yet granted. Use requestPermissions().
+            // MY_PERMISSIONS_REQUEST_SEND_SMS is an
+            // app-defined int constant. The callback method gets the
+            // result of the request.
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.SEND_SMS},
+                    SMS_PERMISSIONS_REQUEST);
+        }
     }
 
     // Callback with the request from calling requestPermissions(...)
@@ -310,6 +358,21 @@ public class ContactsActivity extends AppCompatActivity {
                     Toast.makeText(this, "Read Contacts permission denied", Toast.LENGTH_SHORT).show();
                 }
             }
+        } else if (requestCode == SMS_PERMISSIONS_REQUEST) {
+            if (grantResults.length == 1 &&
+                    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Read Contacts permission granted", Toast.LENGTH_SHORT).show();
+            } else {
+                // showRationale = false if user clicks Never Ask Again, otherwise true
+                boolean showRationale = shouldShowRequestPermissionRationale( Manifest.permission.READ_CONTACTS);
+
+                if (showRationale) {
+                    // do something here to handle degraded mode
+                } else {
+                    Toast.makeText(this, "Read Contacts permission denied", Toast.LENGTH_SHORT).show();
+                }
+            }
+
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }

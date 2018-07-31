@@ -8,7 +8,8 @@ import android.view.ViewGroup;
 
 import threeblindmice.setitup.R;
 
-public class EmptyFragment extends Fragment {
+public class EmptyFragment extends Fragment  {
+
 
     public static EmptyFragment newInstance(){
         return new EmptyFragment();
@@ -21,6 +22,11 @@ public class EmptyFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_empty, container, false);
 
 
+
         return view;
     }
+
+
+
+
 }
