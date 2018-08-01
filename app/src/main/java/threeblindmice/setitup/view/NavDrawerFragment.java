@@ -2,7 +2,6 @@ package threeblindmice.setitup.view;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -10,18 +9,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.tasks.Task;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -41,12 +33,11 @@ public class NavDrawerFragment extends Fragment implements NavInterface {
     private static final String GOOGLE_ACC_TYPE = "com.google";
     private static final int CONST_OPTIONS_ELEMENT_OFFSET = 4;
     private static final int AUTH_REQUEST = 0;
-    private static final int RC_SIGN_IN = 6;
+
 
     //  Dynamic vars
     private String currToken;
     private UpdateTokenEvent tokenEvent;
-    private GoogleSignInClient mGoogleSignInClient;
 
     public static NavDrawerFragment newInstance(){
         return new NavDrawerFragment();
@@ -55,23 +46,12 @@ public class NavDrawerFragment extends Fragment implements NavInterface {
     @Override
     public void onCreate(Bundle bundle){
         super.onCreate(bundle);
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .build();
-        mGoogleSignInClient = GoogleSignIn.getClient(getActivity(), gso);
+
 
 
 
     }
 
-
-
-    private void signIn() {
-
-        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, RC_SIGN_IN);
-
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -83,6 +63,8 @@ public class NavDrawerFragment extends Fragment implements NavInterface {
     @Override
     public void onStart(){
         super.onStart();
+
+
         //  Programmatically set Header height according to Material design spec
         final LinearLayout layout = getView().findViewById(R.id.nav_header_container);
         ViewTreeObserver vto = layout.getViewTreeObserver();
@@ -103,14 +85,6 @@ public class NavDrawerFragment extends Fragment implements NavInterface {
             }
         });
 
-        // Set the dimensions of the sign-in button.
-        Button signInButton = getActivity().findViewById(R.id.sign_in_button);
-        signInButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                signIn();
-            }
-        });
 
 
         //  Unbind the start of the account selection process
@@ -189,30 +163,7 @@ public class NavDrawerFragment extends Fragment implements NavInterface {
         EventBus.getDefault().post(new UpdateFragmentEvent(id));
     }
 
-    @Override
-    public void onActivityResult(int requestCode,int resultCode, Intent intent){
-        super.onActivityResult(requestCode,resultCode,intent);
 
-        // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
-        if (requestCode == RC_SIGN_IN) {
-            System.out.println("Starting TASk");
-            System.out.println(intent.getData());
-            // The Task returned from this call is always completed, no need to attach
-            // a listener.
-            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(intent);
-            handleSignInResult(task);
-        }
-    }
-    private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
-        try {
-            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-            System.out.println("Fetched Account:\t");
-            System.out.println(account.getEmail());
-
-        } catch (ApiException e) {
-            //  Sign-in Failure
-        }
-    }
 }
 
 

@@ -25,9 +25,18 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.Task;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -49,8 +58,19 @@ public class ContactsActivity extends AppCompatActivity {
     private String TAG_EMPTY_FRAGMENT;
     private String TAG_CONTACTS_FRAGMENT;
     private String TAG_SMS_FRAGMENT;
+
+
     private static final String TAG_NAV_FRAGMENT = "Nav";
-    private static final int AUTH_REQUEST = 0;
+    private static final int RC_SIGN_IN = 0;
+    private static final int SIGNED_IN = 1;
+    private static final int STATE_SIGNING_IN = 2;
+    private static final int STATE_IN_PROGRESS = 3;
+
+
+
+
+    private GoogleSignInClient mGoogleSignInClient;
+
 
     private static final String GOOGLE_ACC_TYPE = "com.google";
 
@@ -161,6 +181,79 @@ public class ContactsActivity extends AppCompatActivity {
             trans.commit();
 
         }
+
+
+    }
+
+
+    @Override
+    public void onStart(){
+        super.onStart();
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        if (account != null){
+            System.out.print("\t ACCOUNT: " + account.getEmail());
+
+        }
+
+        //  Google SignIn
+        //  State managed Global in this activity
+
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.google_client_id))
+                .requestEmail()
+                .build();
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+
+
+        // Set the dimensions of the sign-in button.
+        Button signInButton = findViewById(R.id.sign_in_button);
+        signInButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                signIn();
+            }
+        });
+
+    }
+
+    @Override
+    public void onActivityResult(int requestCode,int resultCode, Intent intent){
+        super.onActivityResult(requestCode,resultCode,intent);
+
+        // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
+        if (requestCode == RC_SIGN_IN) {
+            System.out.println("\t Starting Task");
+            System.out.println(intent.getData());
+            System.out.println("\t Result Code: "+intent.getData());
+
+            // The Task returned from this call is always completed, no need to attach
+            // a listener.
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(intent);
+            handleSignInResult(task);
+        }
+
+    }
+
+    private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
+        try {
+            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
+            System.out.println("Fetched Account:\t");
+            System.out.println(account.getEmail());
+
+        } catch (ApiException e) {
+            //  Sign-in Failure
+        }
+    }
+
+
+
+    private void signIn() {
+
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        System.out.println("\t Data signin" + signInIntent.getData());
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+
+
     }
 
 
@@ -282,10 +375,7 @@ public class ContactsActivity extends AppCompatActivity {
 
 
 
-    @Override
-    public void onActivityResult(int requestCode,int resultCode, Intent intent){
-        super.onActivityResult(requestCode,resultCode,intent);
-    }
+
 
 
 
