@@ -31,6 +31,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -45,6 +46,7 @@ import org.greenrobot.eventbus.ThreadMode;
 import threeblindmice.setitup.R;
 import threeblindmice.setitup.events.QueryEvent;
 import threeblindmice.setitup.events.UpdateFragmentEvent;
+import threeblindmice.setitup.events.UpdateUIComponentEvent;
 
 
 /**
@@ -66,6 +68,7 @@ public class ContactsActivity extends AppCompatActivity {
     private static final int STATE_SIGNING_IN = 2;
     private static final int STATE_IN_PROGRESS = 3;
 
+    private GoogleSignInAccount account;
 
 
 
@@ -128,7 +131,7 @@ public class ContactsActivity extends AppCompatActivity {
         }
         getPermissionToReadUserContacts();
 
-// Check for compatible layout versions
+        // Check for compatible layout versions
         if (findViewById(R.id.fragment_container) != null){
             // If a previous state is being restored, return
 
@@ -189,30 +192,34 @@ public class ContactsActivity extends AppCompatActivity {
     @Override
     public void onStart(){
         super.onStart();
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        account = GoogleSignIn.getLastSignedInAccount(this);
         if (account != null){
+            System.out.println("tester");
             System.out.print("\t ACCOUNT: " + account.getEmail());
+            updateUI();
+
+        } else {
+            //  Google SignIn
+            //  State managed Global in this activity
+
+            GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                    .requestIdToken(getString(R.string.google_client_id))
+                    .requestEmail()
+                    .build();
+            mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+
+
+            // Set the dimensions of the sign-in button.
+            Button signInButton = findViewById(R.id.sign_in_button);
+            signInButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    signIn();
+                }
+            });
 
         }
 
-        //  Google SignIn
-        //  State managed Global in this activity
-
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.google_client_id))
-                .requestEmail()
-                .build();
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-
-
-        // Set the dimensions of the sign-in button.
-        Button signInButton = findViewById(R.id.sign_in_button);
-        signInButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                signIn();
-            }
-        });
 
     }
 
@@ -233,13 +240,20 @@ public class ContactsActivity extends AppCompatActivity {
 
     private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
         try {
-            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-            System.out.println("Fetched Account:\t");
-            System.out.println(account.getEmail());
+            account = completedTask.getResult(ApiException.class);
+            updateUI();
+
 
         } catch (ApiException e) {
             //  Sign-in Failure
         }
+    }
+
+    private void updateUI(){
+        EventBus.getDefault().post(new UpdateUIComponentEvent(R.id.nav_header_container_signin,null));
+        EventBus.getDefault().post(new UpdateUIComponentEvent(R.id.nav_header_email,account.getEmail()));
+        EventBus.getDefault().post(new UpdateUIComponentEvent(R.id.nav_header_name,account.getDisplayName()));
+
     }
 
 

@@ -9,13 +9,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.bumptech.glide.Glide;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +28,7 @@ import java.util.List;
 import threeblindmice.setitup.R;
 import threeblindmice.setitup.events.UpdateFragmentEvent;
 import threeblindmice.setitup.events.UpdateTokenEvent;
+import threeblindmice.setitup.events.UpdateUIComponentEvent;
 import threeblindmice.setitup.interfaces.NavInterface;
 import threeblindmice.setitup.listeners.OptionClickListener;
 
@@ -38,6 +44,7 @@ public class NavDrawerFragment extends Fragment implements NavInterface {
     //  Dynamic vars
     private String currToken;
     private UpdateTokenEvent tokenEvent;
+    private View mView;
 
     public static NavDrawerFragment newInstance(){
         return new NavDrawerFragment();
@@ -46,6 +53,7 @@ public class NavDrawerFragment extends Fragment implements NavInterface {
     @Override
     public void onCreate(Bundle bundle){
         super.onCreate(bundle);
+        EventBus.getDefault().register(this);
 
 
 
@@ -57,7 +65,45 @@ public class NavDrawerFragment extends Fragment implements NavInterface {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                               Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_nav_drawer, container, false);
+        mView = view;
         return view;
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void updateUIComponent(UpdateUIComponentEvent event) {
+        final UpdateUIComponentEvent currEvent = event;
+        int vId = currEvent.getView();
+        if (vId == R.id.nav_header_container_signin){
+            getActivity().runOnUiThread(new Runnable(){
+                @Override
+                public void run() {
+                    Object payload = currEvent.getPayload();
+                    View view = getActivity().findViewById(currEvent.getView());
+                    if (payload == null && view instanceof RelativeLayout) {
+
+                        ((RelativeLayout) view).setVisibility(View.GONE);
+                        getActivity().findViewById(R.id.nav_header_container).setVisibility(View.VISIBLE);
+                    }
+                }
+            });
+        } else if (vId == R.id.nav_header_email | vId == R.id.nav_header_name){
+            getActivity().runOnUiThread(new Runnable(){
+                @Override
+                public void run() {
+                    Object payload = currEvent.getPayload();
+                    View view = getActivity().findViewById(currEvent.getView());
+                    if (payload instanceof String && view instanceof TextView) {
+
+                        ((TextView) view).setText((String) payload);
+                    }
+                }
+            });
+        } else if (vId == R.id.nav_header_img){
+            ImageView iv = getActivity().findViewById(R.id.nav_header_img);
+            Glide.with(getActivity()).load(event.getPayload()).into(iv);
+        }
+
+
     }
 
     @Override

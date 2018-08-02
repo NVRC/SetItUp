@@ -20,6 +20,7 @@ import android.widget.TextView;
 import com.futuremind.recyclerviewfastscroll.FastScroller;
 import com.futuremind.recyclerviewfastscroll.SectionTitleProvider;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -323,21 +324,23 @@ public class ContactsFragment extends Fragment {
 
         @Subscribe(threadMode = ThreadMode.MAIN)
         public void updateUIComponent(UpdateUIComponentEvent event) {
-            final UpdateUIComponentEvent currEvent = event;
-            getActivity().runOnUiThread(new Runnable(){
-                @Override
-                public void run() {
-                    Object payload = currEvent.getPayload();
-                    View view = mBinding.getRoot().findViewById(currEvent.getView());
-                    if (payload instanceof String && view instanceof TextView) {
+            if(ArrayUtils.contains(WEEK_IDS, event.getView())) {
+                final UpdateUIComponentEvent currEvent = event;
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Object payload = currEvent.getPayload();
+                        View view = mBinding.getRoot().findViewById(currEvent.getView());
+                        if (payload instanceof String && view instanceof TextView) {
 
 
-                        ((TextView) view).setText((String) payload);
-                    } else if (payload instanceof Integer) {
-                        //  TODO: Use if needed
+                            ((TextView) view).setText((String) payload);
+                        } else if (payload instanceof Integer) {
+                            //  TODO: Use if needed
+                        }
                     }
-                }
-            });
+                });
+            }
 
         }
 
