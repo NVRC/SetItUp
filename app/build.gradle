@@ -32,6 +32,7 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     implementation 'com.google.android.gms:play-services-auth:15.0.1'
+    implementation 'com.google.firebase:firebase-core:16.0.0'
     implementation 'com.android.support:design:27.1.0'
     implementation 'com.android.support:recyclerview-v7:27.1.0'
     implementation 'com.android.support:appcompat-v7:27.1.0'
@@ -45,3 +46,4 @@ dependencies {
 
 
 }
+apply plugin: 'com.google.gms.google-services'

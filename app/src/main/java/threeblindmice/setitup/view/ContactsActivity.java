@@ -222,9 +222,6 @@ public class ContactsActivity extends AppCompatActivity {
 
         // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {
-            System.out.println("\t Starting Task");
-            System.out.println(intent.getData());
-            System.out.println("\t Result Code: "+intent.getData());
 
             // The Task returned from this call is always completed, no need to attach
             // a listener.
@@ -250,7 +247,6 @@ public class ContactsActivity extends AppCompatActivity {
     private void signIn() {
 
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-        System.out.println("\t Data signin" + signInIntent.getData());
         startActivityForResult(signInIntent, RC_SIGN_IN);
 
 
@@ -374,17 +370,6 @@ public class ContactsActivity extends AppCompatActivity {
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
         // TODO: Handle Api lvls < 23 with conditional execution
     @TargetApi(23)
     // Called when the user is performing an action which requires the app to read the
@@ -451,7 +436,7 @@ public class ContactsActivity extends AppCompatActivity {
         } else if (requestCode == SMS_PERMISSIONS_REQUEST) {
             if (grantResults.length == 1 &&
                     grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Read Contacts permission granted", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "SMS permission granted", Toast.LENGTH_SHORT).show();
             } else {
                 // showRationale = false if user clicks Never Ask Again, otherwise true
                 boolean showRationale = shouldShowRequestPermissionRationale( Manifest.permission.READ_CONTACTS);
@@ -459,7 +444,7 @@ public class ContactsActivity extends AppCompatActivity {
                 if (showRationale) {
                     // do something here to handle degraded mode
                 } else {
-                    Toast.makeText(this, "Read Contacts permission denied", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "SMS permission denied", Toast.LENGTH_SHORT).show();
                 }
             }
 
