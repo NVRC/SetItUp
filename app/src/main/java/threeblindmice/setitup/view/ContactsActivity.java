@@ -25,9 +25,19 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.bumptech.glide.Glide;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.Task;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -36,6 +46,7 @@ import org.greenrobot.eventbus.ThreadMode;
 import threeblindmice.setitup.R;
 import threeblindmice.setitup.events.QueryEvent;
 import threeblindmice.setitup.events.UpdateFragmentEvent;
+import threeblindmice.setitup.events.UpdateUIComponentEvent;
 
 
 /**
@@ -49,8 +60,20 @@ public class ContactsActivity extends AppCompatActivity {
     private String TAG_EMPTY_FRAGMENT;
     private String TAG_CONTACTS_FRAGMENT;
     private String TAG_SMS_FRAGMENT;
+
+
     private static final String TAG_NAV_FRAGMENT = "Nav";
-    private static final int AUTH_REQUEST = 0;
+    private static final int RC_SIGN_IN = 0;
+    private static final int SIGNED_IN = 1;
+    private static final int STATE_SIGNING_IN = 2;
+    private static final int STATE_IN_PROGRESS = 3;
+
+    private GoogleSignInAccount account;
+
+
+
+    private GoogleSignInClient mGoogleSignInClient;
+
 
     private static final String GOOGLE_ACC_TYPE = "com.google";
 
@@ -108,7 +131,7 @@ public class ContactsActivity extends AppCompatActivity {
         }
         getPermissionToReadUserContacts();
 
-// Check for compatible layout versions
+        // Check for compatible layout versions
         if (findViewById(R.id.fragment_container) != null){
             // If a previous state is being restored, return
 
@@ -161,6 +184,86 @@ public class ContactsActivity extends AppCompatActivity {
             trans.commit();
 
         }
+
+
+    }
+
+
+    @Override
+    public void onStart(){
+        super.onStart();
+        account = GoogleSignIn.getLastSignedInAccount(this);
+        if (account != null){
+            System.out.println("tester");
+            System.out.print("\t ACCOUNT: " + account.getEmail());
+            updateUI();
+
+        } else {
+            //  Google SignIn
+            //  State managed Global in this activity
+
+            GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                    .requestIdToken(getString(R.string.google_client_id))
+                    .requestEmail()
+                    .build();
+            mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+
+
+            // Set the dimensions of the sign-in button.
+            Button signInButton = findViewById(R.id.sign_in_button);
+            signInButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    signIn();
+                }
+            });
+
+        }
+
+
+    }
+
+    @Override
+    public void onActivityResult(int requestCode,int resultCode, Intent intent){
+        super.onActivityResult(requestCode,resultCode,intent);
+
+        // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
+        if (requestCode == RC_SIGN_IN) {
+
+            // The Task returned from this call is always completed, no need to attach
+            // a listener.
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(intent);
+            handleSignInResult(task);
+        }
+
+    }
+
+    private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
+        try {
+            account = completedTask.getResult(ApiException.class);
+            updateUI();
+
+
+        } catch (ApiException e) {
+            //  Sign-in Failure
+        }
+    }
+
+    private void updateUI(){
+        EventBus.getDefault().post(new UpdateUIComponentEvent(R.id.nav_header_container_signin,null));
+        EventBus.getDefault().post(new UpdateUIComponentEvent(R.id.nav_header_email,account.getEmail()));
+        EventBus.getDefault().post(new UpdateUIComponentEvent(R.id.nav_header_name,account.getDisplayName()));
+
+    }
+
+
+
+    private void signIn() {
+
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+
+
     }
 
 
@@ -281,20 +384,6 @@ public class ContactsActivity extends AppCompatActivity {
     }
 
 
-
-    @Override
-    public void onActivityResult(int requestCode,int resultCode, Intent intent){
-        super.onActivityResult(requestCode,resultCode,intent);
-    }
-
-
-
-
-
-
-
-
-
         // TODO: Handle Api lvls < 23 with conditional execution
     @TargetApi(23)
     // Called when the user is performing an action which requires the app to read the
@@ -361,7 +450,7 @@ public class ContactsActivity extends AppCompatActivity {
         } else if (requestCode == SMS_PERMISSIONS_REQUEST) {
             if (grantResults.length == 1 &&
                     grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Read Contacts permission granted", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "SMS permission granted", Toast.LENGTH_SHORT).show();
             } else {
                 // showRationale = false if user clicks Never Ask Again, otherwise true
                 boolean showRationale = shouldShowRequestPermissionRationale( Manifest.permission.READ_CONTACTS);
@@ -369,7 +458,7 @@ public class ContactsActivity extends AppCompatActivity {
                 if (showRationale) {
                     // do something here to handle degraded mode
                 } else {
-                    Toast.makeText(this, "Read Contacts permission denied", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "SMS permission denied", Toast.LENGTH_SHORT).show();
                 }
             }
 

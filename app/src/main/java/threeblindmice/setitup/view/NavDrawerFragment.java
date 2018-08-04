@@ -2,43 +2,35 @@ package threeblindmice.setitup.view;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.accounts.AccountManagerCallback;
-import android.accounts.AccountManagerFuture;
-import android.accounts.AuthenticatorException;
-import android.accounts.OperationCanceledException;
-import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.bumptech.glide.Glide;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
 import threeblindmice.setitup.R;
 import threeblindmice.setitup.events.UpdateFragmentEvent;
 import threeblindmice.setitup.events.UpdateTokenEvent;
+import threeblindmice.setitup.events.UpdateUIComponentEvent;
 import threeblindmice.setitup.interfaces.NavInterface;
 import threeblindmice.setitup.listeners.OptionClickListener;
-
-import static android.app.Activity.RESULT_OK;
 
 
 public class NavDrawerFragment extends Fragment implements NavInterface {
@@ -48,9 +40,11 @@ public class NavDrawerFragment extends Fragment implements NavInterface {
     private static final int CONST_OPTIONS_ELEMENT_OFFSET = 4;
     private static final int AUTH_REQUEST = 0;
 
+
     //  Dynamic vars
     private String currToken;
     private UpdateTokenEvent tokenEvent;
+    private View mView;
 
     public static NavDrawerFragment newInstance(){
         return new NavDrawerFragment();
@@ -59,19 +53,64 @@ public class NavDrawerFragment extends Fragment implements NavInterface {
     @Override
     public void onCreate(Bundle bundle){
         super.onCreate(bundle);
+        EventBus.getDefault().register(this);
+
+
+
 
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                               Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_nav_drawer, container, false);
+        mView = view;
         return view;
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void updateUIComponent(UpdateUIComponentEvent event) {
+        final UpdateUIComponentEvent currEvent = event;
+        int vId = currEvent.getView();
+        if (vId == R.id.nav_header_container_signin){
+            getActivity().runOnUiThread(new Runnable(){
+                @Override
+                public void run() {
+                    Object payload = currEvent.getPayload();
+                    View view = getActivity().findViewById(currEvent.getView());
+                    if (payload == null && view instanceof RelativeLayout) {
+
+                        ((RelativeLayout) view).setVisibility(View.GONE);
+                        getActivity().findViewById(R.id.nav_header_container).setVisibility(View.VISIBLE);
+                    }
+                }
+            });
+        } else if (vId == R.id.nav_header_email | vId == R.id.nav_header_name){
+            getActivity().runOnUiThread(new Runnable(){
+                @Override
+                public void run() {
+                    Object payload = currEvent.getPayload();
+                    View view = getActivity().findViewById(currEvent.getView());
+                    if (payload instanceof String && view instanceof TextView) {
+
+                        ((TextView) view).setText((String) payload);
+                    }
+                }
+            });
+        } else if (vId == R.id.nav_header_img){
+            ImageView iv = getActivity().findViewById(R.id.nav_header_img);
+            Glide.with(getActivity()).load(event.getPayload()).into(iv);
+        }
+
+
     }
 
     @Override
     public void onStart(){
         super.onStart();
+
+
         //  Programmatically set Header height according to Material design spec
         final LinearLayout layout = getView().findViewById(R.id.nav_header_container);
         ViewTreeObserver vto = layout.getViewTreeObserver();
@@ -91,6 +130,7 @@ public class NavDrawerFragment extends Fragment implements NavInterface {
 
             }
         });
+
 
 
         //  Unbind the start of the account selection process
@@ -115,7 +155,6 @@ public class NavDrawerFragment extends Fragment implements NavInterface {
                             public void onSelection (MaterialDialog dialog, View view, int which, CharSequence text){
                                 AccountManager am = AccountManager.get(getActivity());
                                 am.invalidateAuthToken(GOOGLE_ACC_TYPE,text.toString());
-                                startGoogleAuth(text);
                                 dialog.dismiss();
                             }
 
@@ -161,33 +200,6 @@ public class NavDrawerFragment extends Fragment implements NavInterface {
 
 
     }
-
-    //  Takes a name referenced by an Account in AccountManager
-    private void startGoogleAuth(CharSequence targetName){
-
-        tokenEvent = new UpdateTokenEvent();
-        tokenEvent.addEmail(targetName.toString());
-
-        AccountManager am = AccountManager.get(getActivity());
-        Bundle options = new Bundle();
-
-        //  TODO: check for other account types e.g. Facebook "com.facebook.auth.login"
-        Account[] accounts = am.getAccountsByType(GOOGLE_ACC_TYPE);
-        String AUTH_TOKEN_TYPE = "cp";
-        for (Account acc : accounts){
-            if(acc.name.equals(targetName)){
-                //  Get Account object from AccountManager
-                //  TODO: Implement error handling
-                am.getAuthToken(
-                        acc,                            //  Account retrieved using getAccountsByType()
-                        AUTH_TOKEN_TYPE,                //  Auth scope
-                        options,                        //  Authenticator-specific options
-                        getActivity(),                  
-                        new OnTokenAcquired(),          // Callback on token success
-                        new Handler(new onError()));    // Callback if an error occurred
-            }
-        }
-    }
     
 
     //  Manage fragment transactions with IDs
@@ -197,109 +209,7 @@ public class NavDrawerFragment extends Fragment implements NavInterface {
         EventBus.getDefault().post(new UpdateFragmentEvent(id));
     }
 
-    @Override
-    public void onActivityResult(int requestCode,int resultCode, Intent intent){
 
-        System.out.println("Entered onActivityResult()");
-        System.out.println(requestCode);
-        System.out.println(resultCode);
-
-        if (requestCode == AUTH_REQUEST){
-            System.out.println("Passed AUTH_REQUEST");
-            if (resultCode == RESULT_OK){
-                //  New Auth token
-                System.out.println("Passed RESULT_OK");
-                System.out.println("Google URL attempt");
-                URL url = null;
-                try {
-                    url = new URL("https://www.googleapis.com/tasks/v1/users/@me/lists?key=" + getString(R.string.api_key));
-                } catch (MalformedURLException e){
-                    e.printStackTrace();
-                    //  TODO: Handle error
-                    //  call dialog
-                }
-                URLConnection conn;
-
-                try {
-                    conn = (HttpURLConnection) url.openConnection();
-                } catch (IOException e){
-                    e.printStackTrace();
-                    return;
-                }
-                conn.addRequestProperty("client_id", getString(R.string.google_client_id));
-                conn.addRequestProperty("client_secret", getString(R.string.google_client_secret));
-                conn.setRequestProperty("Authorization", "OAuth " + currToken);
-                try{
-                    conn.connect();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    //  TODO: Handle error
-                }
-            }
-
-        }
-        super.onActivityResult(requestCode,resultCode,intent);
-
-    }
-
-
-
-
-
-    //  Temporary Error handling mechanism for authentication
-    private class onError implements Handler.Callback {
-        @Override
-        public boolean handleMessage(Message message){
-            //  TODO: failfast
-            return true;
-        }
-    }
-
-    private class OnTokenAcquired implements AccountManagerCallback<Bundle> {
-        @Override
-        public void run(AccountManagerFuture<Bundle> result) {
-            //  Get the result of the operation from the AccountManagerFuture.
-            //  TODO: Handle error notification
-            Bundle bundle = null;
-            try {
-                bundle = result.getResult();
-            } catch (OperationCanceledException e){
-                e.printStackTrace();
-            } catch (IOException e){
-                e.printStackTrace();
-            } catch (AuthenticatorException e){
-                e.printStackTrace();
-            }
-            // The token is a named value in the bundle. The name of the value
-            // is stored in the constant AccountManager.KEY_AUTHTOKEN.
-            if (bundle != null) {
-                String token = bundle.getString(AccountManager.KEY_AUTHTOKEN);
-                tokenEvent.addToken(token);
-                currToken = token;
-                EventBus.getDefault().post(tokenEvent);
-
-                Intent launch = null;
-                try {
-                    launch = (Intent) result.getResult().get(AccountManager.KEY_INTENT);
-                } catch (OperationCanceledException e){
-                    e.printStackTrace();
-                } catch (IOException e){
-                    e.printStackTrace();
-                } catch (AuthenticatorException e){
-                    e.printStackTrace();
-                }
-                if (launch != null) {
-                    //System.out.println("\t\t launch init"+launch.getDataString());
-                    //startActivityForResult(launch, AUTH_REQUEST);
-
-                } else {
-                    //  Authentication Token Already Captured
-
-                    System.out.println("\t\tAuthentication token captured");
-                }
-            }
-        }
-    }
 }
 
 
