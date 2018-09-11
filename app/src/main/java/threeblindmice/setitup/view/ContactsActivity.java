@@ -356,30 +356,34 @@ public class ContactsActivity extends AppCompatActivity {
                 trans.addToBackStack(TAG_CONTACTS_FRAGMENT);
                 trans.replace(R.id.fragment_container,cf,TAG_CONTACTS_FRAGMENT);
                 trans.commit();
+                findViewById(R.id.fastscroll).setVisibility(View.VISIBLE);
             }
 
-        } else if (tag.equals(TAG_EMPTY_FRAGMENT)){
-            //  Other options... for now switch to empty fragment
-            // Insert the fragment by replacing any existing fragment
-            Fragment frag = fragmentManager.findFragmentByTag(TAG_CONTACTS_FRAGMENT);
-            if(frag != null && frag.isVisible()){
-                FragmentTransaction trans = getSupportFragmentManager().beginTransaction();
-                trans.replace(R.id.fragment_container, new EmptyFragment(),TAG_EMPTY_FRAGMENT);
-                trans.commit();
-            }
-        } else if (tag.equals(TAG_SMS_FRAGMENT)){
+        } else {
+            findViewById(R.id.fastscroll).setVisibility(View.GONE);
+            if (tag.equals(TAG_EMPTY_FRAGMENT)){
+                //  Other options... for now switch to empty fragment
+                // Insert the fragment by replacing any existing fragment
+                Fragment frag = fragmentManager.findFragmentByTag(TAG_CONTACTS_FRAGMENT);
+                if(frag != null && frag.isVisible()){
+                    FragmentTransaction trans = getSupportFragmentManager().beginTransaction();
+                    trans.replace(R.id.fragment_container, new EmptyFragment(),TAG_EMPTY_FRAGMENT);
+                    trans.commit();
+                }
+            } else if (tag.equals(TAG_SMS_FRAGMENT)){
 
-            //  Other options... for now switch to empty fragment
-            // Insert the fragment by replacing any existing fragment
-            Fragment frag = fragmentManager.findFragmentByTag(TAG_CONTACTS_FRAGMENT);
-            if (frag == null){
-                frag = fragmentManager.findFragmentByTag(TAG_EMPTY_FRAGMENT);
-            }
-            if(frag != null && frag.isVisible()){
-                System.out.println("\t Entered SMS frag");
-                FragmentTransaction trans = getSupportFragmentManager().beginTransaction();
-                trans.replace(R.id.fragment_container, new SmsFragment(),TAG_SMS_FRAGMENT);
-                trans.commit();
+                //  Other options... for now switch to empty fragment
+                // Insert the fragment by replacing any existing fragment
+                Fragment frag = fragmentManager.findFragmentByTag(TAG_CONTACTS_FRAGMENT);
+                if (frag == null){
+                    frag = fragmentManager.findFragmentByTag(TAG_EMPTY_FRAGMENT);
+                }
+                if(frag != null && frag.isVisible()){
+                    System.out.println("\t Entered SMS frag");
+                    FragmentTransaction trans = getSupportFragmentManager().beginTransaction();
+                    trans.replace(R.id.fragment_container, new SmsFragment(),TAG_SMS_FRAGMENT);
+                    trans.commit();
+                }
             }
         }
     }
