@@ -378,7 +378,6 @@ public class ContactsFragment extends Fragment {
 
         @Override
         public void onClick(View view) {
-            System.out.println("Clicking some dumb view: \t\tid "+ view.getId());
             if (view.getId() == R.id.contact_tile_container) {
                 if (childrenLayout.getVisibility() == View.VISIBLE) {
                     childrenLayout.setVisibility(View.GONE);

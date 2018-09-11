@@ -31,7 +31,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -253,6 +252,8 @@ public class ContactsActivity extends AppCompatActivity {
         EventBus.getDefault().post(new UpdateUIComponentEvent(R.id.nav_header_container_signin,null));
         EventBus.getDefault().post(new UpdateUIComponentEvent(R.id.nav_header_email,account.getEmail()));
         EventBus.getDefault().post(new UpdateUIComponentEvent(R.id.nav_header_name,account.getDisplayName()));
+        EventBus.getDefault().post(new UpdateUIComponentEvent(R.id.nav_header_img,account.getPhotoUrl().toString()));
+
 
     }
 
@@ -384,7 +385,7 @@ public class ContactsActivity extends AppCompatActivity {
     }
 
 
-        // TODO: Handle Api lvls < 23 with conditional execution
+    // TODO: Handle Api lvls < 23 with conditional execution
     @TargetApi(23)
     // Called when the user is performing an action which requires the app to read the
     // user's contacts

@@ -100,6 +100,7 @@ public class NavDrawerFragment extends Fragment implements NavInterface {
             });
         } else if (vId == R.id.nav_header_img){
             ImageView iv = getActivity().findViewById(R.id.nav_header_img);
+
             Glide.with(getActivity()).load(event.getPayload()).into(iv);
         }
 
