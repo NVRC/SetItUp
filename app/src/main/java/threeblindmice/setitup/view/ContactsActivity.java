@@ -37,10 +37,13 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
+import com.roomorama.caldroid.CaldroidFragment;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+
+import java.util.Calendar;
 
 import threeblindmice.setitup.R;
 import threeblindmice.setitup.events.QueryEvent;
@@ -59,6 +62,7 @@ public class ContactsActivity extends AppCompatActivity {
     private String TAG_EMPTY_FRAGMENT;
     private String TAG_CONTACTS_FRAGMENT;
     private String TAG_SMS_FRAGMENT;
+    private String TAG_CALENDAR_FRAGMENT;
 
 
     private static final String TAG_NAV_FRAGMENT = "Nav";
@@ -102,6 +106,7 @@ public class ContactsActivity extends AppCompatActivity {
         TAG_EMPTY_FRAGMENT = getString(R.string.empty);
         TAG_CONTACTS_FRAGMENT = getString(R.string.contacts);
         TAG_SMS_FRAGMENT = getString(R.string.sms);
+        TAG_CALENDAR_FRAGMENT = getString(R.string.calendar);
 
         //  INIT toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -144,6 +149,25 @@ public class ContactsActivity extends AppCompatActivity {
             FragmentTransaction trans = getSupportFragmentManager().beginTransaction();
             trans.addToBackStack(TAG_SMS_FRAGMENT);
             trans.replace(R.id.fragment_container, sf, TAG_SMS_FRAGMENT);
+
+            trans.commit();
+
+        }
+
+        // Check for compatible layout versions
+        if (findViewById(R.id.fragment_container) != null){
+            // If a previous state is being restored, return
+
+            if (savedInstanceState != null){
+                return;
+            }
+
+            CalendarFragment cf = new CalendarFragment();
+            // If an intent provides additional run-time params
+            //cf.setArguments(getIntent().getExtras());
+            FragmentTransaction trans = getSupportFragmentManager().beginTransaction();
+            trans.addToBackStack(TAG_CALENDAR_FRAGMENT);
+            trans.replace(R.id.fragment_container, cf, TAG_CALENDAR_FRAGMENT);
 
             trans.commit();
 
@@ -350,14 +374,12 @@ public class ContactsActivity extends AppCompatActivity {
         String tag = event.getTag();
         FragmentManager fragmentManager = getSupportFragmentManager();
         if (tag.equals(TAG_CONTACTS_FRAGMENT)){
-            Fragment frag = fragmentManager.findFragmentByTag(TAG_EMPTY_FRAGMENT);
-            if(frag != null && frag.isVisible()){
-                FragmentTransaction trans = getSupportFragmentManager().beginTransaction();
-                trans.addToBackStack(TAG_CONTACTS_FRAGMENT);
-                trans.replace(R.id.fragment_container,cf,TAG_CONTACTS_FRAGMENT);
-                trans.commit();
-                findViewById(R.id.fastscroll).setVisibility(View.VISIBLE);
-            }
+
+            FragmentTransaction trans = getSupportFragmentManager().beginTransaction();
+            trans.addToBackStack(TAG_CONTACTS_FRAGMENT);
+            trans.replace(R.id.fragment_container,cf,TAG_CONTACTS_FRAGMENT);
+            trans.commit();
+            findViewById(R.id.fastscroll).setVisibility(View.VISIBLE);
 
         } else {
             findViewById(R.id.fastscroll).setVisibility(View.GONE);
@@ -383,6 +405,26 @@ public class ContactsActivity extends AppCompatActivity {
                     FragmentTransaction trans = getSupportFragmentManager().beginTransaction();
                     trans.replace(R.id.fragment_container, new SmsFragment(),TAG_SMS_FRAGMENT);
                     trans.commit();
+                }
+            } else if (tag.equals(TAG_CALENDAR_FRAGMENT)){
+                //  Other options... for now switch to empty fragment
+                //  Insert the fragment by replacing any existing fragment
+                Fragment frag = fragmentManager.findFragmentByTag(TAG_CONTACTS_FRAGMENT);
+                if(frag != null && frag.isVisible()){
+                    System.out.println("\t Entered Calendar frag");
+
+
+                    CaldroidFragment caldroidFragment = new CaldroidFragment();
+                    Bundle args = new Bundle();
+                    Calendar cal = Calendar.getInstance();
+                    args.putInt(CaldroidFragment.MONTH, cal.get(Calendar.MONTH) + 1);
+                    args.putInt(CaldroidFragment.YEAR, cal.get(Calendar.YEAR));
+
+                    caldroidFragment.setArguments(args);
+
+                    FragmentTransaction t = getSupportFragmentManager().beginTransaction();
+                    t.replace(R.id.fragment_container, caldroidFragment);
+                    t.commit();
                 }
             }
         }

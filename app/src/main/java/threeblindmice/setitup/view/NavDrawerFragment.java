@@ -190,7 +190,7 @@ public class NavDrawerFragment extends Fragment implements NavInterface {
         OptionClickListener ocl1 = new OptionClickListener();
         OptionClickListener ocl2 = new OptionClickListener();
         ocl0.setId(getString(R.string.contacts));
-        ocl1.setId(getString(R.string.empty));
+        ocl1.setId(getString(R.string.calendar));
         ocl2.setId(getString(R.string.sms));
         ocl0.setCallback(this);
         ocl1.setCallback(this);

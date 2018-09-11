@@ -126,7 +126,7 @@
                 android:layout_marginLeft="@dimen/nav_option_padding"
                 android:textSize="@dimen/nav_option_text_size"
                 android:textColor="@color/primary_dark"
-                android:text="@string/empty" />
+                android:text="@string/calendar" />
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
