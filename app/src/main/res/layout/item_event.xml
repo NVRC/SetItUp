@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:bind="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable
+            name="viewModel"
+            type="threeblindmice.setitup.viewmodel.EventViewModel"/>
+    </data>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:orientation="vertical" android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/event_tile_container">
+            <TextView
+                android:id="@+id/event_start_time"
+                android:layout_width="@dimen/event_time"
+                android:layout_height="@dimen/event_time"
+                android:text="@{viewModel.start}" />
+            <TextView
+                android:id="@+id/even_end_time"
+                android:layout_width="@dimen/event_time"
+                android:layout_height="@dimen/event_time"
+                android:text="@{viewModel.end}"  />
+
+
+
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="vertical" android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+
+
+        </LinearLayout>
+
+
+
+    </LinearLayout>
+
+</layout>

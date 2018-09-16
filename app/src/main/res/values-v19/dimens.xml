@@ -43,6 +43,10 @@
     <dimen name="week_selector_padding">8dp</dimen>
     <dimen name="week_selector_height">40dp</dimen>
 
+    <dimen name="event_time">16dp</dimen>
+    <dimen name="event_date">16dp</dimen>
+    <dimen name="event_id">16dp</dimen>
+
 
 
 

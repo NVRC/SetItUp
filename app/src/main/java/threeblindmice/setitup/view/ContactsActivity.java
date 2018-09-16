@@ -423,7 +423,7 @@ public class ContactsActivity extends AppCompatActivity {
                     caldroidFragment.setArguments(args);
 
                     FragmentTransaction t = getSupportFragmentManager().beginTransaction();
-                    t.replace(R.id.fragment_container, caldroidFragment);
+                    t.replace(R.id.fragment_container, caldroidFragment, TAG_CALENDAR_FRAGMENT);
                     t.commit();
                 }
             }
