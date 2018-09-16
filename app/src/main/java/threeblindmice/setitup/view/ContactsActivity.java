@@ -38,12 +38,14 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 import com.roomorama.caldroid.CaldroidFragment;
+import com.roomorama.caldroid.CaldroidListener;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.Calendar;
+import java.util.Date;
 
 import threeblindmice.setitup.R;
 import threeblindmice.setitup.events.QueryEvent;
@@ -63,6 +65,7 @@ public class ContactsActivity extends AppCompatActivity {
     private String TAG_CONTACTS_FRAGMENT;
     private String TAG_SMS_FRAGMENT;
     private String TAG_CALENDAR_FRAGMENT;
+    private String TAG_DATE_DIALOG;
 
 
     private static final String TAG_NAV_FRAGMENT = "Nav";
@@ -107,6 +110,7 @@ public class ContactsActivity extends AppCompatActivity {
         TAG_CONTACTS_FRAGMENT = getString(R.string.contacts);
         TAG_SMS_FRAGMENT = getString(R.string.sms);
         TAG_CALENDAR_FRAGMENT = getString(R.string.calendar);
+        TAG_DATE_DIALOG = getString(R.string.date);
 
         //  INIT toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -421,6 +425,13 @@ public class ContactsActivity extends AppCompatActivity {
                     args.putInt(CaldroidFragment.YEAR, cal.get(Calendar.YEAR));
 
                     caldroidFragment.setArguments(args);
+                    caldroidFragment.setCaldroidListener(new CaldroidListener() {
+                        @Override
+                        public void onSelectDate(Date date, View view) {
+                            EventsDialogFragment dateDialog = EventsDialogFragment.newInstance(date);
+                            dateDialog.show(getFragmentManager(),TAG_DATE_DIALOG);
+                        }
+                    });
 
                     FragmentTransaction t = getSupportFragmentManager().beginTransaction();
                     t.replace(R.id.fragment_container, caldroidFragment, TAG_CALENDAR_FRAGMENT);

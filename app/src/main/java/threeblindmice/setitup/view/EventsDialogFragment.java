@@ -6,6 +6,7 @@ import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,14 +14,29 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import me.everything.providers.android.calendar.Event;
 import threeblindmice.setitup.R;
-import threeblindmice.setitup.databinding.ItemContactBinding;
-import threeblindmice.setitup.model.Contact;
+import threeblindmice.setitup.databinding.DialogEventsBinding;
+import threeblindmice.setitup.databinding.ItemEventBinding;
 import threeblindmice.setitup.viewmodel.EventViewModel;
 
 public class EventsDialogFragment extends DialogFragment {
+
+    private RecyclerView mRecyclerView;
+    private DialogEventsBinding binding;
+    private EventAdapter mEventAdapter;
+
+
+
+    public static EventsDialogFragment newInstance(Date date) {
+        EventsDialogFragment edf = new EventsDialogFragment();
+        Bundle args = new Bundle();
+        args.putLong("date",date.getTime());
+        edf.setArguments(args);
+        return edf;
+    }
 
     public Dialog onCreateDialog(Bundle savedInstanceState){
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -33,12 +49,79 @@ public class EventsDialogFragment extends DialogFragment {
         return builder.create();
     }
 
+    @Override
+    public void onCreate(Bundle savedInstanceState){
+        super.onCreate(savedInstanceState);
+
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState){
+        View rootView = inflater.inflate(R.layout.dialog_events,container);
+        Bundle dateBundle = this.getArguments();
+        Date date = new Date();
+        date.setTime(dateBundle.getLong("date"));
+
+        mEventAdapter = new EventsDialogFragment.EventAdapter(fetchDailyEvents(date));
+
+        binding = DataBindingUtil
+                .inflate(inflater, R.layout.dialog_events, null, false);
+        binding.recyclerViewEvents.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        binding.recyclerViewEvents.setAdapter(mEventAdapter);
+        return rootView;
+    }
+
+    public ArrayList<Event> fetchDailyEvents(Date date){
+
+        ArrayList<Event> tempList = new ArrayList<>();
+        Event tempE = new Event();
+        tempE.dTStart = 0;
+        tempE.dTend = 100;
+        tempE.title = "Value";
+        tempList.add(tempE);
+
+        return tempList;
+    }
+
+    private class EventAdapter extends RecyclerView.Adapter<EventsDialogFragment.EventHolder>{
+        private ArrayList<Event> mData;
+
+        public EventAdapter(ArrayList<Event> events){
+            mData = events;
+        }
+
+        @Override
+        public EventsDialogFragment.EventHolder onCreateViewHolder(ViewGroup parent, int viewType){
+            LayoutInflater inflater = LayoutInflater.from(getActivity());
+            ItemEventBinding binding = DataBindingUtil
+                    .inflate(inflater, R.layout.item_event, parent, false);
+            return new EventsDialogFragment.EventHolder(binding);
+        }
+
+        @Override
+        public void onBindViewHolder(EventsDialogFragment.EventHolder holder, int position){
+            Event event = mData.get(position);
+            //  Fixes recyclerView expandable item duplication
+            holder.setIsRecyclable(false);
+            holder.bind(event);
+        }
+
+        @Override public int getItemCount(){
+            if (mData == null){ return 0;}
+            return mData.size();
+        }
+
+
+    }
+
     private class EventHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        private ItemContactBinding mBinding;
+        private ItemEventBinding mBinding;
         private Context mContext;
         private LinearLayout childrenLayout;
 
-        private EventHolder(ItemContactBinding binding) {
+        private EventHolder(ItemEventBinding binding) {
             super(binding.getRoot());
             mBinding = binding;
 
@@ -60,30 +143,5 @@ public class EventsDialogFragment extends DialogFragment {
         }
     }
 
-        private class ContactAdapter extends RecyclerView.Adapter<EventsDialogFragment.EventHolder>{
-        private ArrayList<Event> mData;
 
-            @Override
-            public EventsDialogFragment.EventHolder onCreateViewHolder(ViewGroup parent, int viewType){
-                LayoutInflater inflater = LayoutInflater.from(getActivity());
-                ItemContactBinding binding = DataBindingUtil
-                        .inflate(inflater, R.layout.item_event, parent, false);
-                return new EventsDialogFragment.EventHolder(binding);
-            }
-
-            @Override
-            public void onBindViewHolder(EventsDialogFragment.EventHolder holder, int position){
-                Event event = mData.get(position);
-                //  Fixes recyclerView expandable item duplication
-                holder.setIsRecyclable(false);
-                holder.bind(event);
-            }
-
-            @Override public int getItemCount(){
-                if (mData == null){ return 0;}
-                return mData.size();
-            }
-
-
-    }
 }
