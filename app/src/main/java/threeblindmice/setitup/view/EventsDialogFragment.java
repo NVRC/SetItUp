@@ -5,6 +5,7 @@ import android.app.DialogFragment;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -38,40 +39,53 @@ public class EventsDialogFragment extends DialogFragment {
         return edf;
     }
 
+    @Override
     public Dialog onCreateDialog(Bundle savedInstanceState){
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         // Get the layout inflater
         LayoutInflater inflater = getActivity().getLayoutInflater();
 
-        // Inflate and set the layout for the dialog
-        // Pass null as the parent view because its going in the dialog layout
-        builder.setView(inflater.inflate(R.layout.dialog_events, null));
-        return builder.create();
-    }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState){
-        super.onCreate(savedInstanceState);
-
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState){
-        View rootView = inflater.inflate(R.layout.dialog_events,container);
-        Bundle dateBundle = this.getArguments();
-        Date date = new Date();
-        date.setTime(dateBundle.getLong("date"));
-
-        mEventAdapter = new EventsDialogFragment.EventAdapter(fetchDailyEvents(date));
 
         binding = DataBindingUtil
                 .inflate(inflater, R.layout.dialog_events, null, false);
         binding.recyclerViewEvents.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         binding.recyclerViewEvents.setAdapter(mEventAdapter);
-        return rootView;
+
+        // Inflate and set the layout for the dialog
+        // Pass null as the parent view because its going in the dialog layout
+
+        builder.setView(binding.getRoot());
+        return builder.create();
     }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState){
+        super.onCreate(savedInstanceState);
+        Bundle dateBundle = this.getArguments();
+        Date date = new Date();
+        date.setTime(dateBundle.getLong("date"));
+        mEventAdapter = new EventAdapter(fetchDailyEvents(date));
+
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+
+        return binding.getRoot();
+    }
+
+
+    @Override
+    public void onStart(){
+        super.onStart();
+    }
+
+
 
     public ArrayList<Event> fetchDailyEvents(Date date){
 
@@ -92,9 +106,10 @@ public class EventsDialogFragment extends DialogFragment {
             mData = events;
         }
 
+        @NonNull
         @Override
         public EventsDialogFragment.EventHolder onCreateViewHolder(ViewGroup parent, int viewType){
-            LayoutInflater inflater = LayoutInflater.from(getActivity());
+            LayoutInflater inflater = LayoutInflater.from(getContext());
             ItemEventBinding binding = DataBindingUtil
                     .inflate(inflater, R.layout.item_event, parent, false);
             return new EventsDialogFragment.EventHolder(binding);
@@ -108,7 +123,8 @@ public class EventsDialogFragment extends DialogFragment {
             holder.bind(event);
         }
 
-        @Override public int getItemCount(){
+        @Override
+        public int getItemCount(){
             if (mData == null){ return 0;}
             return mData.size();
         }
@@ -128,13 +144,14 @@ public class EventsDialogFragment extends DialogFragment {
             mContext = mBinding.getRoot().getContext();
             mBinding.getRoot().findViewById(R.id.event_tile_container).setOnClickListener(this);
 
-            mBinding.setViewModel(new EventViewModel());
+            mBinding.setViewModelEvent(new EventViewModel());
 
 
         }
 
+
         public void bind(Event event){
-            mBinding.getViewModel().setEvent(event);
+            mBinding.getViewModelEvent().setEvent(event);
             mBinding.executePendingBindings();
         }
         @Override

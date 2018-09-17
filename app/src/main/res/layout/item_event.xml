@@ -3,7 +3,7 @@
     xmlns:bind="http://schemas.android.com/apk/res-auto">
     <data>
         <variable
-            name="viewModel"
+            name="viewModelEvent"
             type="threeblindmice.setitup.viewmodel.EventViewModel"/>
     </data>
     <LinearLayout
@@ -19,18 +19,19 @@
                 android:id="@+id/event_start_time"
                 android:layout_width="@dimen/event_time"
                 android:layout_height="@dimen/event_time"
-                android:text="@{viewModel.start}" />
+                android:text="@{viewModelEvent.start}" />
             <TextView
                 android:id="@+id/even_end_time"
                 android:layout_width="@dimen/event_time"
                 android:layout_height="@dimen/event_time"
-                android:text="@{viewModel.end}"  />
+                android:text="@{viewModelEvent.end}"  />
 
 
 
         </LinearLayout>
         <LinearLayout
-            android:orientation="vertical" android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
             android:layout_height="match_parent">
 
 
