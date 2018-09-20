@@ -9,32 +9,44 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_marginTop="2dp"
+        android:layout_marginLeft="2dp"
+        android:layout_marginRight="2dp"
+        android:background="@color/primary_light"
+        android:layout_height="@dimen/event_tile_height">
 
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/event_tile_container">
+            android:id="@+id/event_tile_container"
+            android:gravity="start">
             <TextView
                 android:id="@+id/event_start_time"
-                android:layout_width="@dimen/event_time"
-                android:layout_height="@dimen/event_time"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textSize="@dimen/event_tile_time_size"
+                android:textColor="@color/secondary_text"
                 android:text="@{viewModelEvent.start}" />
             <TextView
                 android:id="@+id/event_end_time"
-                android:layout_width="@dimen/event_time"
-                android:layout_height="@dimen/event_time"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textSize="@dimen/event_tile_time_size"
+                android:textColor="@color/secondary_text"
                 android:text="@{viewModelEvent.end}"  />
         </LinearLayout>
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:gravity="end">
             <TextView
                 android:id="@+id/event_title"
-                android:layout_width="@dimen/event_id"
-                android:layout_height="@dimen/event_id"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textSize="@dimen/event_tile_title_size"
+                android:textColor="@color/secondary_text"
                 android:text="@{viewModelEvent.title}"/>
 
 

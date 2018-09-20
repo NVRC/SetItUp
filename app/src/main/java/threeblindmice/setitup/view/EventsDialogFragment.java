@@ -145,9 +145,9 @@ public class EventsDialogFragment extends DialogFragment {
                         accountName = cursor.getString(PROJECTION_ACCOUNT_NAME_INDEX);
                         ownerName = cursor.getString(PROJECTION_OWNER_ACCOUNT_INDEX);
 
+                        //  Retrieve events associated to each calendar related to
+                        //      the authenticated Account
                         fetchEvents(calId);
-
-
                     }
                 }
             }

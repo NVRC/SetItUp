@@ -47,6 +47,14 @@
     <dimen name="event_date">16dp</dimen>
     <dimen name="event_id">16dp</dimen>
 
+    <dimen name="event_tile_height">56dp</dimen>
+    <dimen name="event_tile_padding">8dp</dimen>
+    <dimen name="event_tile_time_padding">16dp</dimen>
+    <dimen name="event_tile_title_padding">16dp</dimen>
+    <dimen name="event_tile_time_size">16sp</dimen>
+    <dimen name="event_tile_title_size">24sp</dimen>
+
+
 
 
 
