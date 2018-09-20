@@ -428,7 +428,7 @@ public class ContactsActivity extends AppCompatActivity {
                     caldroidFragment.setCaldroidListener(new CaldroidListener() {
                         @Override
                         public void onSelectDate(Date date, View view) {
-                            EventsDialogFragment dateDialog = EventsDialogFragment.newInstance(date);
+                            EventsDialogFragment dateDialog = EventsDialogFragment.newInstance(date, account.getEmail());
                             dateDialog.show(getFragmentManager(),TAG_DATE_DIALOG);
                         }
                     });

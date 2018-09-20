@@ -12,7 +12,8 @@
         android:layout_height="match_parent">
 
         <LinearLayout
-            android:orientation="vertical" android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/event_tile_container">
             <TextView
@@ -21,19 +22,20 @@
                 android:layout_height="@dimen/event_time"
                 android:text="@{viewModelEvent.start}" />
             <TextView
-                android:id="@+id/even_end_time"
+                android:id="@+id/event_end_time"
                 android:layout_width="@dimen/event_time"
                 android:layout_height="@dimen/event_time"
                 android:text="@{viewModelEvent.end}"  />
-
-
-
         </LinearLayout>
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-
+            <TextView
+                android:id="@+id/event_title"
+                android:layout_width="@dimen/event_id"
+                android:layout_height="@dimen/event_id"
+                android:text="@{viewModelEvent.title}"/>
 
 
         </LinearLayout>
